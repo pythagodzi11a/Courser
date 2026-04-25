@@ -1,0 +1,117 @@
+package top.pythagodzilla.courser.network
+
+import android.util.Log
+import okhttp3.FormBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.internal.platform.PlatformRegistry.applicationContext
+import org.json.JSONObject
+import top.pythagodzilla.courser.data.DataStore
+
+class OkHttpManager(private val client: OkHttpClient = OkHttpClient()) : NetworkManager {
+    override suspend fun getSessionId(
+        deviceUuid: String,
+        appVersion: String,
+        password: String,
+        devicePlatform: String,
+        deviceVersion: String,
+        username: String,
+        deviceName: String
+    ): Result<String> {
+        return try {
+            val body = FormBody.Builder()
+                .add("deviceUuid", deviceUuid)
+                .add("appVersion", appVersion)
+                .add("j_password", password)
+                .add("devicePlatform", devicePlatform)
+                .add("deviceVersion", deviceVersion)
+                .add("j_username", username)
+                .add("deviceName", deviceName)
+                .build()
+
+            Log.d(
+                "OkHttpManager",
+                "Request Body: deviceUuid=$deviceUuid, appVersion=$appVersion, j_password=$password, devicePlatform=$devicePlatform, deviceVersion=$deviceVersion, j_username=$username, deviceName=$deviceName"
+            )
+            Log.d("OkHttpManager", body.toString())
+
+            val request = Request.Builder()
+                .url("http://course.buct.edu.cn/mobile/getSessionId.do")
+                .post(body)
+                .build()
+
+            client.newCall(request).execute().use { response ->
+                val code = response.code
+                val text = response.body.string()
+                Log.d("OkHttpManager", "httpCode=$code")
+                Log.d("OkHttpManager", "responseBody=$text")
+
+                if (!response.isSuccessful) {
+                    return Result.failure(Exception("HTTP $code: $text"))
+                }
+
+                val json = JSONObject(text) // 如果这里炸，会在 catch 里看到
+                val status = json.optInt("status", 0)
+                val sessionId = json.optString("sessionid", "")
+                if (status == 1 && sessionId.isNotBlank()) Result.success(sessionId)
+                else Result.failure(Exception("Login failed: $text"))
+            }
+
+        } catch (e: Exception) {
+            Log.e("OkHttpManager", "Error during login: ${e::class.java.name}: ${e.message}", e)
+            Result.failure(e)
+        }
+
+    }
+
+    override suspend fun checkSession(
+        deviceUuid: String,
+        appVersion: String,
+        password: String,
+        devicePlatform: String,
+        deviceVersion: String,
+        username: String,
+        deviceName: String
+    ): Result<Boolean> {
+        val body = FormBody.Builder()
+            .add("deviceUuid", deviceUuid)
+            .add("appVersion", appVersion)
+            .add("j_password", password)
+            .add("devicePlatform", devicePlatform)
+            .add("deviceVersion", deviceVersion)
+            .add("j_username", username)
+            .add("deviceName", deviceName)
+            .build()
+
+        val request: Request = Request.Builder()
+            .url("http://course.buct.edu.cn/mobile/login_check.do")
+            .post(body)
+            .build()
+
+        return try {
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) {
+                    return Result.failure(Exception("HTTP ${response.code}: ${response.body.string()}"))
+                }
+
+                val json = JSONObject(response.body.string())
+                val status = json.optInt("status", 0)
+                Result.success(status == 1)
+            }
+        }catch (e: Exception) {
+            Log.e("OkHttpManager", "Error during session check: ${e::class.java.name}: ${e.message}", e)
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun isSessionValid(sessionId: String): Boolean {
+        val dataStore = DataStore()
+
+        val _client = OkHttpClient.Builder()
+            .addInterceptor(SessionCookieInterceptor())
+
+        val request = Request.Builder()
+            .url("http://course.buct.edu.cn/mobile/stuReminderList.do")
+
+    }
+}

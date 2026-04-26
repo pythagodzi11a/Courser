@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,53 +33,55 @@ fun LoginScreen(client: NetworkManager, dataStore: DataStoreManager) {
     val scope = rememberCoroutineScope()
 
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("登录")
-        OutlinedTextField(
-            value = username,
-            onValueChange = { username = it },
-            label = { Text("用户名") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Text("密码")
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("密码") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Button(
-            onClick = {
-                scope.launch {
-                    sessionString = "请求中"
-                    val result = withContext(Dispatchers.IO) {
-                        client.getSessionId(
-                            username = username,
-                            password = password
-                        )
-                    }
-                    sessionString = result.fold(
-                        onSuccess = { "Session ID: $it" },
-                        onFailure = { "登录失败: ${it.message}" }
-                    )
-
-                    dataStore.addLoginInfo(username, password)
-                }
-            },
-            modifier = Modifier.padding(top = 16.dp)
+    Surface(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text("登录")
+            OutlinedTextField(
+                value = username,
+                onValueChange = { username = it },
+                label = { Text("用户名") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Text("密码")
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("密码") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Button(
+                onClick = {
+                    scope.launch {
+                        sessionString = "请求中"
+                        val result = withContext(Dispatchers.IO) {
+                            client.getSessionId(
+                                username = username,
+                                password = password
+                            )
+                        }
+                        sessionString = result.fold(
+                            onSuccess = { "Session ID: $it" },
+                            onFailure = { "登录失败: ${it.message}" }
+                        )
+
+                        dataStore.addLoginInfo(username, password)
+                    }
+                },
+                modifier = Modifier.padding(top = 16.dp)
+            ) {
+                Text("登录")
+            }
+
+            Text(sessionString)
+
         }
-
-        Text(sessionString)
-
     }
 }

@@ -3,9 +3,8 @@ package top.pythagodzilla.courser.network
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
-import top.pythagodzilla.courser.data.DataStore
+import top.pythagodzilla.courser.data.DataStoreManager
 
-@OptIn(kotlin.uuid.ExperimentalUuidApi::class)
 interface NetworkManager {
     suspend fun getSessionId(
         deviceUuid: String = "923cc477a1c01902",
@@ -31,7 +30,7 @@ interface NetworkManager {
 }
 
 class SessionCookieInterceptor(
-    private val dataStore: DataStore
+    private val dataStore: DataStoreManager
 ): Interceptor{
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
@@ -40,7 +39,7 @@ class SessionCookieInterceptor(
             dataStore.readSessionId()
         }
 
-        val  newRequest = if (sessionid.isNullOrBlank()){
+        val  newRequest = if (!sessionid.isNullOrBlank()){
             request.newBuilder()
                 .addHeader("Cookie", "sessionid=$sessionid")
                 .build()

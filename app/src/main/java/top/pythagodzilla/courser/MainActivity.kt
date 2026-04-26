@@ -1,6 +1,7 @@
 package top.pythagodzilla.courser
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,12 +12,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import top.pythagodzilla.courser.data.DataStore
+import okhttp3.OkHttpClient
+import top.pythagodzilla.courser.data.DataStoreManager
+import top.pythagodzilla.courser.network.NetworkManager
 import top.pythagodzilla.courser.network.OkHttpManager
-import top.pythagodzilla.courser.ui.home.HomeScreen
-import top.pythagodzilla.courser.ui.login.LoginScreen
+import top.pythagodzilla.courser.network.SessionCookieInterceptor
+import top.pythagodzilla.courser.ui.HomeScreen
+import top.pythagodzilla.courser.ui.LoginScreen
 import top.pythagodzilla.courser.ui.theme.CourserTheme
 
 
@@ -25,12 +32,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-
-        val dataStore = DataStore(applicationContext)
+        val dataStore = DataStoreManager(applicationContext)
+        val client = OkHttpClient.Builder()
+            .addInterceptor(SessionCookieInterceptor(dataStore))
+            .build()
 
         setContent {
             CourserTheme {
-                AppRoot(dataStore)
+                AppRoot(dataStore, client)
             }
         }
     }
@@ -38,54 +47,49 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun AppRoot(dataStore: DataStore) {
+fun AppRoot(dataStore: DataStoreManager, httpClient: OkHttpClient) {
 
     // 没有做登录判断，先默认为true，后续要记得改
-    var isLoggedIn by rememberSaveable { mutableStateOf(false) }
     var isFirstStart by rememberSaveable { mutableStateOf(true) }
-    var shouldShowLogin by rememberSaveable { mutableStateOf(true) }
+    var haveLoginInfoStatus by rememberSaveable { mutableStateOf(true) }
+    var startDestination by rememberSaveable { mutableStateOf("login") }
 
-    val client = remember { OkHttpManager() }
+    val client: NetworkManager =
+        remember { OkHttpManager(client = httpClient, dataStore = dataStore) }
+    val navController = rememberNavController()
 
     LaunchedEffect(Unit) {
         isFirstStart = withContext(Dispatchers.IO) {
             dataStore.readFirstStart()
         }
+
+        haveLoginInfoStatus = haveLoginInfo(dataStore)
+
+        if (isFirstStart || !haveLoginInfoStatus) {
+            // 第一次启动，进入login
+            Log.d("AppRoot", "第一次启动，进入login")
+
+            dataStore.setFirstStart()
+            startDestination = "login"
+        } else {
+            // 已经登录过，进入home
+            Log.d("AppRoot", "查询到用户信息，进入home")
+            startDestination = "home"
+        }
     }
 
-    // 所有的判断都是为了shouldShowLogin状态，决定开启是否直接进入Login。
-    if (isFirstStart) {
-        // 第一次打开，直接去登录界面
-        LaunchedEffect(Unit) {
-            withContext(Dispatchers.IO) {
-                dataStore.setFirstStart()
-
-                shouldShowLogin = true
-            }
-        }
-
-    } else {
-        // 已经不是第一次打开应用
-        LaunchedEffect(Unit) {
-            withContext(Dispatchers.IO) {
-                val currentSession = dataStore.readSessionId()
-                shouldShowLogin = if (currentSession.isNullOrBlank()) {
-                    true
-                } else {
-                    withContext(Dispatchers.IO) {
-                        // 有效就直接进入主页，无效就去登录界面
-                        !client.isSessionValid(currentSession)
-                    }
-                }
-            }
-        }
-        // 所有东西都准备好了，直接进入主页
-        shouldShowLogin = false
+    NavHost(
+        navController = navController,
+        startDestination = startDestination
+    ) {
+        composable("login") { LoginScreen(client, dataStore) }
+        composable("home") { HomeScreen(client) }
     }
 
-    if (shouldShowLogin) {
-        LoginScreen(client)
-    } else {
-        HomeScreen(client)
+}
+
+suspend fun haveLoginInfo(dataStore: DataStoreManager): Boolean {
+    return withContext(Dispatchers.IO) {
+        dataStore.readLoginInfo()
     }
 }

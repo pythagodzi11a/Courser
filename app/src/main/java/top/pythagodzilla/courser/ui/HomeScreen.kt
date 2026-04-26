@@ -1,4 +1,4 @@
-package top.pythagodzilla.courser.ui.home
+package top.pythagodzilla.courser.ui
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -14,11 +14,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import top.pythagodzilla.courser.R
-import top.pythagodzilla.courser.network.OkHttpManager
+import top.pythagodzilla.courser.network.NetworkManager
 
 
 @Composable
-fun HomeScreen(client: OkHttpManager) {
+fun HomeScreen(client: NetworkManager) {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
 
     NavigationSuiteScaffold(

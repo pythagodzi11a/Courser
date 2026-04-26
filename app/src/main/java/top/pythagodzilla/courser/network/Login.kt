@@ -4,11 +4,11 @@ import android.util.Log
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.internal.platform.PlatformRegistry.applicationContext
 import org.json.JSONObject
-import top.pythagodzilla.courser.data.DataStore
+import top.pythagodzilla.courser.data.DataStoreManager
 
-class OkHttpManager(private val client: OkHttpClient = OkHttpClient()) : NetworkManager {
+class LoginModule(private val client: OkHttpClient = OkHttpClient(), dataStore: DataStoreManager) :
+    NetworkManager {
     override suspend fun getSessionId(
         deviceUuid: String,
         appVersion: String,
@@ -98,20 +98,45 @@ class OkHttpManager(private val client: OkHttpClient = OkHttpClient()) : Network
                 val status = json.optInt("status", 0)
                 Result.success(status == 1)
             }
-        }catch (e: Exception) {
-            Log.e("OkHttpManager", "Error during session check: ${e::class.java.name}: ${e.message}", e)
+        } catch (e: Exception) {
+            Log.e(
+                "OkHttpManager",
+                "Error during session check: ${e::class.java.name}: ${e.message}",
+                e
+            )
             Result.failure(e)
         }
     }
 
     override suspend fun isSessionValid(sessionId: String): Boolean {
-        val dataStore = DataStore()
-
-        val _client = OkHttpClient.Builder()
-            .addInterceptor(SessionCookieInterceptor())
-
         val request = Request.Builder()
             .url("http://course.buct.edu.cn/mobile/stuReminderList.do")
+            .get()
+            .build()
 
+        try {
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) {
+                    Log.e(
+                        "OkHttpManager",
+                        "Error happened when check session. response not succeed. HTTP ${response.code}: ${response.body.string()}"
+                    )
+                    return false
+                }
+
+                val text = response.body.string()
+                val json = JSONObject(text)
+                val status = json.optInt("status", -2)
+
+                return status == 1
+            }
+        } catch (e: Exception) {
+            Log.e(
+                "OkHttpManager",
+                "Error during session validation: ${e::class.java.name}: ${e.message}",
+                e
+            )
+            return false
+        }
     }
 }

@@ -1,4 +1,4 @@
-package top.pythagodzilla.courser.ui.login
+package top.pythagodzilla.courser.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,17 +20,17 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import top.pythagodzilla.courser.network.OkHttpManager
+import top.pythagodzilla.courser.data.DataStoreManager
+import top.pythagodzilla.courser.network.NetworkManager
 
 @Composable
-fun LoginScreen(client: OkHttpManager) {
+fun LoginScreen(client: NetworkManager, dataStore: DataStoreManager) {
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
-
     var sessionString by rememberSaveable { mutableStateOf("") }
+
     val scope = rememberCoroutineScope()
 
-//    val client = remember { OkHttpManager() }
 
     Column(
         modifier = Modifier
@@ -69,6 +69,8 @@ fun LoginScreen(client: OkHttpManager) {
                         onSuccess = { "Session ID: $it" },
                         onFailure = { "登录失败: ${it.message}" }
                     )
+
+                    dataStore.addLoginInfo(username, password)
                 }
             },
             modifier = Modifier.padding(top = 16.dp)

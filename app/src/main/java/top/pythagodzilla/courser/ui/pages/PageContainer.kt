@@ -18,7 +18,6 @@ import top.pythagodzilla.courser.network.NetworkManager
 
 @Composable
 fun PageContainer(client: NetworkManager, dataStore: DataStoreManager) {
-    var pageNavigator = rememberNavController()
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
 
     NavigationSuiteScaffold(

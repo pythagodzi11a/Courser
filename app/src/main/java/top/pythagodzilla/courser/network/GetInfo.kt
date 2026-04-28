@@ -4,6 +4,7 @@ import android.util.Log
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import org.json.JSONObject
 import top.pythagodzilla.courser.data.types.TasksApiResponseClass
 
 class GetInfoModule(private val client: OkHttpClient = OkHttpClient()) {
@@ -23,6 +24,12 @@ class GetInfoModule(private val client: OkHttpClient = OkHttpClient()) {
                 if (!response.isSuccessful) {
                     Log.e("GetInfoModule", "request failed: HTTP ${response.code}")
                     return Result.failure(Exception("HTTP ${response.code}: $content"))
+                }
+
+                val status = JSONObject(content).optInt("status", 0)
+                if (status != 1) {
+                    Log.w("GetInfoModule", "business status=$status")
+                    return Result.failure(Exception("Business status=$status: $content"))
                 }
 
                 Log.d("GetInfoModule", "start decode TasksApiResponseClass")

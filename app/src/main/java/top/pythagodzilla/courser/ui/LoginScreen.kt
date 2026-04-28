@@ -1,5 +1,6 @@
 package top.pythagodzilla.courser.ui
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -68,11 +69,20 @@ fun LoginScreen(client: NetworkManager, dataStore: DataStoreManager) {
                             )
                         }
                         sessionString = result.fold(
-                            onSuccess = { "Session ID: $it" },
-                            onFailure = { "登录失败: ${it.message}" }
+                            onSuccess = { sessionId ->
+                                // 暂时存在这留着调试，以后会删除
+                                Log.d("DataStore", "session store: $sessionId")
+                                dataStore.saveSessionId(sessionId)
+                                "Session ID: $sessionId"
+                            },
+                            onFailure = { response ->
+                                Log.d("DataStore", " session get failed")
+                                "登录失败: ${response.message}"
+                            }
                         )
 
                         dataStore.addLoginInfo(username, password)
+                        Log.d("LoginScreen", "登录结果: $")
                     }
                 },
                 modifier = Modifier.padding(top = 16.dp)

@@ -7,9 +7,8 @@ import okhttp3.Request
 import org.json.JSONObject
 import top.pythagodzilla.courser.data.DataStoreManager
 
-class LoginModule(private val client: OkHttpClient = OkHttpClient(), dataStore: DataStoreManager) :
-    NetworkManager {
-    override suspend fun getSessionId(
+class LoginModule(private val client: OkHttpClient = OkHttpClient(), dataStore: DataStoreManager){
+    suspend fun getSessionId(
         deviceUuid: String,
         appVersion: String,
         password: String,
@@ -64,7 +63,7 @@ class LoginModule(private val client: OkHttpClient = OkHttpClient(), dataStore: 
 
     }
 
-    override suspend fun checkSession(
+    suspend fun checkSession(
         deviceUuid: String,
         appVersion: String,
         password: String,
@@ -108,7 +107,7 @@ class LoginModule(private val client: OkHttpClient = OkHttpClient(), dataStore: 
         }
     }
 
-    override suspend fun isSessionValid(sessionId: String): Boolean {
+    suspend fun isSessionValid(): Boolean {
         val request = Request.Builder()
             .url("http://course.buct.edu.cn/mobile/stuReminderList.do")
             .get()

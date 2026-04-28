@@ -2,12 +2,16 @@ package top.pythagodzilla.courser.network
 
 import okhttp3.OkHttpClient
 import top.pythagodzilla.courser.data.DataStoreManager
+import top.pythagodzilla.courser.data.types.TasksApiResponseClass
 
 class OkHttpManager(
     client: OkHttpClient,
     dataStore: DataStoreManager
 ) : NetworkManager {
+
+    // login相关处理，封装到loginModule
     private val loginModule = LoginModule(client, dataStore)
+    private val getInfoModule = GetInfoModule(client)
 
     override suspend fun getSessionId(
         deviceUuid: String,
@@ -45,5 +49,9 @@ class OkHttpManager(
         deviceName
     )
 
-    override suspend fun isSessionValid(sessionId: String) = loginModule.isSessionValid(sessionId)
+    override suspend fun isSessionValid(sessionId: String) = loginModule.isSessionValid()
+
+    // 获取信息接口的实现，封装到GetInfoModule
+    override suspend fun getUndoTasks(): Result<TasksApiResponseClass> = getInfoModule.getUndoTasks()
+
 }

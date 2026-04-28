@@ -4,8 +4,11 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
 import top.pythagodzilla.courser.data.DataStoreManager
+import top.pythagodzilla.courser.data.types.TasksApiResponseClass
 
 interface NetworkManager {
+
+    // 登录相关接口
     suspend fun getSessionId(
         deviceUuid: String = "923cc477a1c01902",
         appVersion: String = "8.7.1",
@@ -27,11 +30,14 @@ interface NetworkManager {
     ): Result<Boolean>
 
     suspend fun isSessionValid(sessionId: String): Boolean
+
+    // 获取信息相关接口
+    suspend fun getUndoTasks(): Result<TasksApiResponseClass>
 }
 
 class SessionCookieInterceptor(
     private val dataStore: DataStoreManager
-): Interceptor{
+) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
 
@@ -39,11 +45,11 @@ class SessionCookieInterceptor(
             dataStore.readSessionId()
         }
 
-        val  newRequest = if (!sessionid.isNullOrBlank()){
+        val newRequest = if (!sessionid.isNullOrBlank()) {
             request.newBuilder()
                 .addHeader("Cookie", "sessionid=$sessionid")
                 .build()
-        }else request
+        } else request
 
         return chain.proceed(newRequest)
     }

@@ -12,7 +12,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.navigation.compose.rememberNavController
 import top.pythagodzilla.courser.data.DataStoreManager
 import top.pythagodzilla.courser.network.NetworkManager
 

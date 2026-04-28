@@ -40,6 +40,8 @@ android {
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.2")
     implementation("androidx.compose.material:material-icons-core:1.7.8")
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation("androidx.navigation:navigation-compose:2.9.8")

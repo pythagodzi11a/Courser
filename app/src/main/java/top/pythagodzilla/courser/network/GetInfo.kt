@@ -28,8 +28,8 @@ class GetInfoModule(private val client: OkHttpClient = OkHttpClient()) {
 
                 val status = JSONObject(content).optInt("status", 0)
                 if (status != 1) {
-                    Log.w("GetInfoModule", "business status=$status")
-                    return Result.failure(Exception("Business status=$status: $content"))
+                    Log.w("GetInfoModule", "status=$status")
+                    return Result.failure(Exception("Required Login"))
                 }
 
                 Log.d("GetInfoModule", "start decode TasksApiResponseClass")

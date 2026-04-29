@@ -26,10 +26,6 @@ class DataStoreManager(private val context: Context) {
         context.dataStore.edit { it[sessionKey] = sessionId }
     }
 
-    suspend fun clearSessionId() {
-        context.dataStore.edit { it.remove(sessionKey) }
-    }
-
     suspend fun readSessionId(): String? {
         return context.dataStore.data.map { it[sessionKey] }.first()
     }
@@ -47,11 +43,18 @@ class DataStoreManager(private val context: Context) {
         context.dataStore.edit { it[firstStartKey] = isFirstStart }
     }
 
-    suspend fun readLoginInfo(): Boolean {
+    suspend fun readLoginInfo1(): Boolean {
         val username = context.dataStore.data.map { it[usernameKey] }.first()
         val password = context.dataStore.data.map { it[passwordKey] }.first()
 
         return !username.isNullOrBlank() && !password.isNullOrBlank()
+    }
+
+    suspend fun readLoginInfo(): Pair<String?, String?> {
+        val username = context.dataStore.data.map { it[usernameKey] }.first()
+        val password = context.dataStore.data.map { it[passwordKey] }.first()
+
+        return Pair(username, password)
     }
 
     suspend fun addLoginInfo(username: String, password: String) {

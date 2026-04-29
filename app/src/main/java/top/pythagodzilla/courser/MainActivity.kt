@@ -101,12 +101,12 @@ fun AppRoot(dataStore: DataStoreManager, httpClient: OkHttpClient) {
             composable("page") { PageContainer(client, dataStore) }
         }
     }
-
 }
 
 suspend fun haveLoginInfo(dataStore: DataStoreManager): Boolean {
     return withContext(Dispatchers.IO) {
-        dataStore.readLoginInfo()
+        val (username, password) = dataStore.readLoginInfo()
+        !username.isNullOrBlank() && !password.isNullOrBlank()
     }
 }
 

@@ -35,7 +35,7 @@ fun PageContainer(client: NetworkManager, dataStore: DataStoreManager) {
         }
     ) {
         when (currentDestination) {
-            AppDestinations.HOME -> HomeScreen(client)
+            AppDestinations.HOME -> HomeScreen(client, dataStore)
             AppDestinations.PROFILE -> LoginScreen(client, dataStore)
         }
     }

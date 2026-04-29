@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import top.pythagodzilla.courser.data.DataStoreManager
 import top.pythagodzilla.courser.network.NetworkManager
+import top.pythagodzilla.courser.ui.LoginScreen
 
 @Composable
 fun PageContainer(client: NetworkManager, dataStore: DataStoreManager) {
@@ -35,7 +36,7 @@ fun PageContainer(client: NetworkManager, dataStore: DataStoreManager) {
     ) {
         when (currentDestination) {
             AppDestinations.HOME -> HomeScreen(client)
-            AppDestinations.PROFILE -> HomeScreen(client)
+            AppDestinations.PROFILE -> LoginScreen(client, dataStore)
         }
     }
 }

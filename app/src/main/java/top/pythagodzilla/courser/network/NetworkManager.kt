@@ -1,5 +1,6 @@
 package top.pythagodzilla.courser.network
 
+import android.util.Log
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -45,9 +46,11 @@ class SessionCookieInterceptor(
             dataStore.readSessionId()
         }
 
+        Log.d("SessionCookieInterceptor", "Read sessionid from DataStore: $sessionid")
+
         val newRequest = if (!sessionid.isNullOrBlank()) {
             request.newBuilder()
-                .addHeader("Cookie", "sessionid=$sessionid")
+                .addHeader("Cookie", "JSESSIONID=$sessionid")
                 .build()
         } else request
 

@@ -7,7 +7,7 @@ import okhttp3.Request
 import org.json.JSONObject
 import top.pythagodzilla.courser.data.DataStoreManager
 
-class LoginModule(private val client: OkHttpClient = OkHttpClient(), dataStore: DataStoreManager){
+class LoginModule(private val client: OkHttpClient = OkHttpClient(), dataStore: DataStoreManager) {
     suspend fun getSessionId(
         deviceUuid: String,
         appVersion: String,
@@ -39,6 +39,11 @@ class LoginModule(private val client: OkHttpClient = OkHttpClient(), dataStore: 
                 .post(body)
                 .build()
 
+            val notificationRequest = Request.Builder()
+                .url("http://course.buct.edu.cn/mobile/login_check.do")
+                .post(body)
+                .build()
+
             client.newCall(request).execute().use { response ->
                 val code = response.code
                 val text = response.body.string()
@@ -52,9 +57,37 @@ class LoginModule(private val client: OkHttpClient = OkHttpClient(), dataStore: 
                 val json = JSONObject(text) // 如果这里炸，会在 catch 里看到
                 val status = json.optInt("status", 0)
                 val sessionId = json.optString("sessionid", "")
-                if (status == 1 && sessionId.isNotBlank()) Result.success(sessionId)
-                else Result.failure(Exception("Login failed: $text"))
+                if (status == 1 && sessionId.isNotBlank()) {
+                } else {
+                    Result.failure<Exception>(Exception("Login failed: $text"))
+                }
             }
+
+            client.newCall(notificationRequest).execute().use { response ->
+                val text = response.body.string()
+                Log.d(
+                    "OkHttpManager",
+                    "Notification request httpCode=${response.code}, responseBody=$text"
+                )
+                if (!response.isSuccessful) {
+                    Log.d(
+                        "OkHttpManager",
+                        "Notification request failed: HTTP ${response.code}: $text"
+                    )
+                    return Result.failure(Exception("Notification request failed: HTTP ${response.code}: $text"))
+                }
+
+                val json = JSONObject(text)
+                val status = json.optInt("status", 0)
+                if (status == 1) {
+                    return Result.success(json.optString("sessionid", ""))
+                } else {
+                    Result.failure(Exception("Notification request failed: $text"))
+                }
+
+
+            }
+
 
         } catch (e: Exception) {
             Log.e("OkHttpManager", "Error during login: ${e::class.java.name}: ${e.message}", e)

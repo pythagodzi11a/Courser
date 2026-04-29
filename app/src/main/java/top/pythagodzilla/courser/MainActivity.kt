@@ -20,7 +20,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import top.pythagodzilla.courser.data.DataStoreManager
@@ -29,7 +28,6 @@ import top.pythagodzilla.courser.network.OkHttpManager
 import top.pythagodzilla.courser.network.SessionCookieInterceptor
 import top.pythagodzilla.courser.ui.LoginScreen
 import top.pythagodzilla.courser.ui.SplashScreen
-import top.pythagodzilla.courser.ui.pages.HomeScreen
 import top.pythagodzilla.courser.ui.pages.PageContainer
 import top.pythagodzilla.courser.ui.theme.CourserTheme
 
@@ -73,7 +71,7 @@ fun AppRoot(dataStore: DataStoreManager, httpClient: OkHttpClient) {
 
         haveLoginInfoStatus = haveLoginInfo(dataStore)
 
-        delay(1000)
+//        delay(1000)
 
         if (isFirstStart || !haveLoginInfoStatus) {
             // 第一次启动，进入login

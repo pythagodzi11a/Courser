@@ -5,7 +5,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
 import top.pythagodzilla.courser.data.DataStoreManager
-import top.pythagodzilla.courser.data.types.TasksApiResponseClass
+import top.pythagodzilla.courser.data.response.TasksApiResponseClass
 
 interface NetworkManager {
 
@@ -50,7 +50,7 @@ class SessionCookieInterceptor(
 
         val newRequest = if (!sessionid.isNullOrBlank()) {
             request.newBuilder()
-                .addHeader("Cookie", "JSESSIONID=$sessionid")
+                .header("Cookie", "JSESSIONID=$sessionid")
                 .build()
         } else request
 

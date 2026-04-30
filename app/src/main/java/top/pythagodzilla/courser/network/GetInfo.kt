@@ -5,7 +5,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
-import top.pythagodzilla.courser.data.types.TasksApiResponseClass
+import top.pythagodzilla.courser.data.response.TasksApiResponseClass
 
 class GetInfoModule(private val client: OkHttpClient = OkHttpClient()) {
     suspend fun getUndoTasks(): Result<TasksApiResponseClass> {

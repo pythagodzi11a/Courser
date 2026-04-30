@@ -8,6 +8,18 @@ import org.json.JSONObject
 import top.pythagodzilla.courser.data.DataStoreManager
 
 class LoginModule(private val client: OkHttpClient = OkHttpClient(), dataStore: DataStoreManager) {
+    suspend fun commonLogin(
+        deviceUuid: String,
+        appVersion: String,
+        password: String,
+        devicePlatform: String,
+        deviceVersion: String,
+        username: String,
+        deviceName: String
+    ) {
+
+    }
+
     suspend fun getSessionId(
         deviceUuid: String,
         appVersion: String,

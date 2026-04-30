@@ -2,7 +2,7 @@ package top.pythagodzilla.courser.network
 
 import okhttp3.OkHttpClient
 import top.pythagodzilla.courser.data.DataStoreManager
-import top.pythagodzilla.courser.data.types.TasksApiResponseClass
+import top.pythagodzilla.courser.data.response.TasksApiResponseClass
 
 class OkHttpManager(
     client: OkHttpClient,

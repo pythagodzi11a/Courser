@@ -43,13 +43,6 @@ class DataStoreManager(private val context: Context) {
         context.dataStore.edit { it[firstStartKey] = isFirstStart }
     }
 
-    suspend fun readLoginInfo1(): Boolean {
-        val username = context.dataStore.data.map { it[usernameKey] }.first()
-        val password = context.dataStore.data.map { it[passwordKey] }.first()
-
-        return !username.isNullOrBlank() && !password.isNullOrBlank()
-    }
-
     suspend fun readLoginInfo(): Pair<String?, String?> {
         val username = context.dataStore.data.map { it[usernameKey] }.first()
         val password = context.dataStore.data.map { it[passwordKey] }.first()

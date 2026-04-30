@@ -1,7 +1,6 @@
 package top.pythagodzilla.courser.network
 
 import android.util.Log
-import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
@@ -10,7 +9,7 @@ import top.pythagodzilla.courser.data.response.TasksApiResponseClass
 class GetInfoModule(private val client: OkHttpClient = OkHttpClient()) {
     suspend fun getUndoTasks(): Result<TasksApiResponseClass> {
         Log.d("GetInfoModule", "getUndoTasks start")
-        val json = Json { ignoreUnknownKeys = true }
+
         val request = Request.Builder()
             .url("http://course.buct.edu.cn/mobile/stuUnDoTaskList.do")
             .build()
@@ -42,7 +41,11 @@ class GetInfoModule(private val client: OkHttpClient = OkHttpClient()) {
                 Result.success(result)
             }
         } catch (e: Exception) {
-            Log.e("GetInfoModule", "getUndoTasks exception: ${e::class.java.simpleName}: ${e.message}", e)
+            Log.e(
+                "GetInfoModule",
+                "getUndoTasks exception: ${e::class.java.simpleName}: ${e.message}",
+                e
+            )
             Result.failure(Exception("Failed to get undo tasks: ${e.message}", e))
         }
     }

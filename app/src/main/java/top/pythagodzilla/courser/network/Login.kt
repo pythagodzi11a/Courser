@@ -6,6 +6,9 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
 import top.pythagodzilla.courser.data.DataStoreManager
+import top.pythagodzilla.courser.data.response.CheckLoginDatas
+import top.pythagodzilla.courser.network.exception.HttpException
+import top.pythagodzilla.courser.network.exception.LoginStatusException
 
 class LoginModule(private val client: OkHttpClient = OkHttpClient(), dataStore: DataStoreManager) {
     suspend fun commonLogin(
@@ -116,7 +119,7 @@ class LoginModule(private val client: OkHttpClient = OkHttpClient(), dataStore: 
         deviceVersion: String,
         username: String,
         deviceName: String
-    ): Result<Boolean> {
+    ): Result<CheckLoginDatas> {
         val body = FormBody.Builder()
             .add("deviceUuid", deviceUuid)
             .add("appVersion", appVersion)
@@ -132,23 +135,34 @@ class LoginModule(private val client: OkHttpClient = OkHttpClient(), dataStore: 
             .post(body)
             .build()
 
-        return try {
+        try {
             client.newCall(request).execute().use { response ->
+                val content = response.body.string()
+
                 if (!response.isSuccessful) {
-                    return Result.failure(Exception("HTTP ${response.code}: ${response.body.string()}"))
+                    Log.e(
+                        "OkHttpManager",
+                        "Check session request failed: HTTP ${response.code}: $content"
+                    )
+                    return Result.failure(HttpException(response.code, response.message))
                 }
 
-                val json = JSONObject(response.body.string())
-                val status = json.optInt("status", 0)
-                Result.success(status == 1)
+                val status = JSONObject(content).optInt("status", 0)
+                if (status != 1) {
+                    Log.w("OkHttpManager", "")
+                    return Result.failure(LoginStatusException(response.code, status, content))
+                }
+
+                val result = json.decodeFromString<CheckLoginDatas>(content)
+                Result.success(result)
             }
         } catch (e: Exception) {
             Log.e(
                 "OkHttpManager",
-                "Error during session check: ${e::class.java.name}: ${e.message}",
+                "Error occurred during session check request: ${e::class.java.name}: ${e.message}",
                 e
             )
-            Result.failure(e)
+            return Result.failure(e)
         }
     }
 

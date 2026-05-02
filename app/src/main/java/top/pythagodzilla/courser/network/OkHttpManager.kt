@@ -78,11 +78,6 @@ class OkHttpManager(
     override suspend fun getUndoTasks(): Result<TasksApiResponseClass> =
         getInfoModule.getUndoTasks()
 
-    override suspend fun checkResponseStatus(response: Response) =
-        loginModule.checkResponseNotLogin(response)
 
-    override suspend fun isSessionValid(sessionId: String): Boolean {
-        TODO("Not yet implemented")
-    }
-
+    override suspend fun isSessionValid(sessionId: String): Boolean = loginModule.isSessionValid()
 }

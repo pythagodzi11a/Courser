@@ -20,7 +20,7 @@ interface NetworkManager {
         deviceVersion: String = "15",
         username: String,
         deviceName: String = "GUGUGAGA"
-    )
+    ): Result<String>
 
     suspend fun getSessionId(
         deviceUuid: String = "923cc477a1c01902",
@@ -42,7 +42,6 @@ interface NetworkManager {
         deviceName: String
     ): Result<BaseCheckLoginResponse>
 
-    suspend fun checkResponseStatus(response: Response): Result<String>
 
     suspend fun isSessionValid(sessionId: String): Boolean
 

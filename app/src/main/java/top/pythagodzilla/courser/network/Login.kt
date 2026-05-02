@@ -7,6 +7,7 @@ import okhttp3.Request
 import top.pythagodzilla.courser.data.DataStoreManager
 import top.pythagodzilla.courser.network.exception.HttpException
 import top.pythagodzilla.courser.network.exception.SessionExpiredException
+import top.pythagodzilla.courser.network.exception.StringException
 import top.pythagodzilla.courser.network.exception.UnknownException
 import top.pythagodzilla.courser.network.response.BaseCheckLoginResponse
 import top.pythagodzilla.courser.network.response.FailureCheckLoginResponse
@@ -20,7 +21,7 @@ class LoginModule(
 ) {
 
     /**
-     * 这个方法是用于登录界面登录的主要放啊放，
+     * 这个方法是用于登录界面登录的主要方法，同时会自动把session存入DataStore.
      */
     suspend fun commonLogin(
         deviceUuid: String,
@@ -30,7 +31,7 @@ class LoginModule(
         deviceVersion: String,
         username: String,
         deviceName: String
-    ) {
+    ): Result<String> {
 
         val getSessionRes = getSessionId(
             deviceUuid,
@@ -64,6 +65,8 @@ class LoginModule(
                                 "Login successful, sessionid: ${response.sessionid}"
                             )
                             dataStore.saveSessionId(response.sessionid)
+
+                            return Result.success(response.sessionid)
                         }
                     }
 
@@ -72,7 +75,11 @@ class LoginModule(
                     }
                 }
             }
-            .onFailure { }
+            .onFailure { exception ->
+                return Result.failure(StringException("Login failed: ${exception.message}"))
+            }
+
+        return Result.failure(StringException("Login failed"))
     }
 
     /**
@@ -123,7 +130,12 @@ class LoginModule(
                 "OkHttpManager",
                 "Error occurred during getSessionId request: ${e::class.java.name}: ${e.message}"
             )
-            throw e
+
+            return GetSessionResponse(
+                status = 0,
+                message = "Error occurred: ${e.message}",
+                sessionid = ""
+            )
         }
     }
 

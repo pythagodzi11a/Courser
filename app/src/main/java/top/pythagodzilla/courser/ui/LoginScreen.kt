@@ -1,12 +1,12 @@
 package top.pythagodzilla.courser.ui
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -29,7 +29,9 @@ import top.pythagodzilla.courser.network.NetworkManager
 fun LoginScreen(client: NetworkManager, dataStore: DataStoreManager) {
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
-    var sessionString by rememberSaveable { mutableStateOf("") }
+    var message by rememberSaveable { mutableStateOf("") }
+
+    var buttonLoading by rememberSaveable { mutableStateOf(false)}
 
     val scope = rememberCoroutineScope()
 
@@ -61,37 +63,36 @@ fun LoginScreen(client: NetworkManager, dataStore: DataStoreManager) {
             Button(
                 onClick = {
                     scope.launch {
-                        sessionString = "请求中"
-                        val result = withContext(Dispatchers.IO) {
-                            client.getSessionId(
+
+                        buttonLoading = true
+
+                        withContext(Dispatchers.IO) {
+                            val result = client.commonLogin(
                                 username = username,
                                 password = password
                             )
-                        }
-                        sessionString = result.fold(
-                            onSuccess = { sessionId ->
-                                // 暂时存在这留着调试，以后会删除
-                                Log.d("DataStore", "session store: $sessionId")
-                                dataStore.saveSessionId(sessionId)
-                                "Session ID: $sessionId"
-                            },
-                            onFailure = { response ->
-                                Log.d("DataStore", " session get failed")
-                                "登录失败: ${response.message}"
-                            }
-                        )
 
-                        dataStore.addLoginInfo(username, password)
-                        Log.d("LoginScreen", "登录结果: $")
+                            result.onSuccess { message = it }
+                                .onFailure {
+                                    message = it.message ?: it.toString()
+                                }
+                        }
+                        buttonLoading = false
                     }
                 },
+                enabled = !buttonLoading,
                 modifier = Modifier.padding(top = 16.dp)
             ) {
-                Text("登录")
+                if (buttonLoading) Text("登录中...")
+                else Text("登录")
             }
 
-            Text(sessionString)
+            Text(message)
 
         }
     }
+}
+
+fun toLogin() {
+
 }

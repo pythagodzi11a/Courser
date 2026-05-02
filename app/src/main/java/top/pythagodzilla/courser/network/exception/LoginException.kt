@@ -17,3 +17,7 @@ data class UnknownException(
     val code: Int,
     val exceptionMessage: String
 ) : Exception("An unknown error occurred $code: $exceptionMessage")
+
+data class StringException(
+    val exceptionMessage: String
+): Exception(exceptionMessage)

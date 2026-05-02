@@ -97,8 +97,8 @@ fun AppRoot(dataStore: DataStoreManager, httpClient: OkHttpClient) {
             startDestination = startDestination!!,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable("login") { LoginScreen(client, dataStore) }
-            composable("page") { PageContainer(client, dataStore) }
+            composable("login") { LoginScreen(client, dataStore, navController) }
+            composable("pages") { PageContainer(client, dataStore) }
         }
     }
 }

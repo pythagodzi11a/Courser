@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -19,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -26,12 +26,12 @@ import top.pythagodzilla.courser.data.DataStoreManager
 import top.pythagodzilla.courser.network.NetworkManager
 
 @Composable
-fun LoginScreen(client: NetworkManager, dataStore: DataStoreManager) {
+fun LoginScreen(client: NetworkManager, dataStore: DataStoreManager, navController: NavController) {
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var message by rememberSaveable { mutableStateOf("") }
 
-    var buttonLoading by rememberSaveable { mutableStateOf(false)}
+    var buttonLoading by rememberSaveable { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
 
@@ -72,7 +72,10 @@ fun LoginScreen(client: NetworkManager, dataStore: DataStoreManager) {
                                 password = password
                             )
 
-                            result.onSuccess { message = it }
+                            result.onSuccess { result ->
+                                message = result
+                                navController.navigate("pages")
+                            }
                                 .onFailure {
                                     message = it.message ?: it.toString()
                                 }

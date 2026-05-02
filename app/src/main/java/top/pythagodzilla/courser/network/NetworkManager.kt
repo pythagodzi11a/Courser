@@ -5,8 +5,9 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
 import top.pythagodzilla.courser.data.DataStoreManager
-import top.pythagodzilla.courser.data.response.CheckLoginDatas
-import top.pythagodzilla.courser.data.response.TasksApiResponseClass
+import top.pythagodzilla.courser.network.response.BaseCheckLoginResponse
+import top.pythagodzilla.courser.network.response.GetSessionResponse
+import top.pythagodzilla.courser.network.response.TasksApiResponseClass
 
 interface NetworkManager {
 
@@ -19,7 +20,7 @@ interface NetworkManager {
         deviceVersion: String = "15",
         username: String,
         deviceName: String = "GUGUGAGA"
-    ): Result<String>
+    )
 
     suspend fun getSessionId(
         deviceUuid: String = "923cc477a1c01902",
@@ -29,9 +30,9 @@ interface NetworkManager {
         deviceVersion: String = "15",
         username: String,
         deviceName: String = "GUGUGAGA"
-    ): Result<String>
+    ): GetSessionResponse
 
-    suspend fun checkSession(
+    suspend fun loginCheck(
         deviceUuid: String,
         appVersion: String,
         password: String,
@@ -39,7 +40,9 @@ interface NetworkManager {
         deviceVersion: String,
         username: String,
         deviceName: String
-    ): Result<CheckLoginDatas>
+    ): Result<BaseCheckLoginResponse>
+
+    suspend fun checkResponseStatus(response: Response): Result<String>
 
     suspend fun isSessionValid(sessionId: String): Boolean
 

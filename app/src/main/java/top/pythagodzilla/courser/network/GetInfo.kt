@@ -3,10 +3,18 @@ package top.pythagodzilla.courser.network
 import android.util.Log
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.json.JSONObject
-import top.pythagodzilla.courser.data.response.TasksApiResponseClass
+import top.pythagodzilla.courser.network.exception.HttpException
+import top.pythagodzilla.courser.network.exception.SessionExpiredException
+import top.pythagodzilla.courser.network.exception.UnknownException
+import top.pythagodzilla.courser.network.response.TasksApiResponseClass
+import top.pythagodzilla.courser.network.response.checkResponseNotLogin
 
 class GetInfoModule(private val client: OkHttpClient = OkHttpClient()) {
+
+    /**
+     * 获取待办任务列表
+     * @return Result 包含 TasksApiResponseClass 或异常
+     */
     suspend fun getUndoTasks(): Result<TasksApiResponseClass> {
         Log.d("GetInfoModule", "getUndoTasks start")
 
@@ -14,31 +22,44 @@ class GetInfoModule(private val client: OkHttpClient = OkHttpClient()) {
             .url("http://course.buct.edu.cn/mobile/stuUnDoTaskList.do")
             .build()
 
-        return try {
+        try {
             client.newCall(request).execute().use { response ->
-                val content = response.body.string()
-                Log.d("GetInfoModule", "httpCode=${response.code}, bodyLength=${content.length}")
-                Log.d("GetInfoModule", "responsePreview=${content.take(300)}")
+                val finalResponse = checkResponseNotLogin(response)
 
-                if (!response.isSuccessful) {
-                    Log.e("GetInfoModule", "request failed: HTTP ${response.code}")
-                    return Result.failure(Exception("HTTP ${response.code}: $content"))
-                }
+                finalResponse
+                    .onSuccess { response ->
 
-                val status = JSONObject(content).optInt("status", 0)
-                if (status != 1) {
-                    Log.w("GetInfoModule", "status=$status")
-                    return Result.failure(Exception("Required Login"))
-                }
+                        return Result.success(json.decodeFromString<TasksApiResponseClass>(response.body.string()))
+                    }
+                    .onFailure { exception ->
+                        when (exception) {
+                            is HttpException -> {
+                                Log.e(
+                                    "GetInfoModule",
+                                    "HTTP error occurred: ${exception.code}: ${exception.message}"
+                                )
+                                return Result.failure(exception)
+                            }
 
-                Log.d("GetInfoModule", "start decode TasksApiResponseClass")
-                val result = json.decodeFromString<TasksApiResponseClass>(content)
-                Log.d(
-                    "GetInfoModule",
-                    "decode success: status=${result.status}, sessionid=${result.sessionid}, courses=${result.datas.size}"
-                )
+                            is SessionExpiredException -> {
+                                Log.e(
+                                    "GetInfoModule",
+                                    "Session expired: ${exception.code}: ${exception.message}"
+                                )
+                                return Result.failure(exception)
+                            }
 
-                Result.success(result)
+                            is UnknownException -> {
+                                Log.e(
+                                    "GetInfoModule",
+                                    "Unknown error occurred: ${exception.code}: ${exception.message}"
+                                )
+                                return Result.failure(exception)
+                            }
+                        }
+                    }
+
+                return Result.failure(UnknownException(response.code, "Unexpected response format"))
             }
         } catch (e: Exception) {
             Log.e(
@@ -46,7 +67,7 @@ class GetInfoModule(private val client: OkHttpClient = OkHttpClient()) {
                 "getUndoTasks exception: ${e::class.java.simpleName}: ${e.message}",
                 e
             )
-            Result.failure(Exception("Failed to get undo tasks: ${e.message}", e))
+            return Result.failure(Exception("Failed to get undo tasks: ${e.message}", e))
         }
     }
 }

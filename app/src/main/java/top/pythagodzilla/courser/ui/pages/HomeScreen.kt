@@ -25,40 +25,18 @@ fun HomeScreen(client: NetworkManager, dataStore: DataStoreManager) {
         Log.d("HomeScreen", "requesting undo tasks")
         var taskInfo = withContext(Dispatchers.IO) { client.getUndoTasks() }
 
-        if (taskInfo.isFailure) {
-            val firstError = taskInfo.exceptionOrNull()
-            Log.e("HomeScreen", "first getUndoTasks failed: ${firstError?.message}", firstError)
 
-            if (firstError?.message == "Required Login") {
-                Log.i("HomeScreen", "session expired, trying relogin")
-                val (username, password) = withContext(Dispatchers.IO) { dataStore.readLoginInfo() }
-                if (username == null || password == null) {
-                    Log.e("HomeScreen", "No login info stored")
-                } else {
-                    val sessionResult = withContext(Dispatchers.IO) {
-                        client.getSessionId(username = username, password = password)
-                    }
-                    if (sessionResult.isSuccess) {
-                        val sessionId = sessionResult.getOrNull().orEmpty()
-                        Log.d("HomeScreen", "Login success, new sessionid: $sessionId")
-                        withContext(Dispatchers.IO) {
-                            dataStore.saveSessionId(sessionId)
-                            taskInfo = client.getUndoTasks()
-                        }
-                        Log.d("HomeScreen", "retry getUndoTasks result: $taskInfo")
-                    } else {
-                        val loginError = sessionResult.exceptionOrNull()
-                        Log.e("HomeScreen", "Login failed: ${loginError?.message}", loginError)
-                    }
-                }
+
+
+        taskInfo
+            .onSuccess { response ->
+                Log.d(
+                    "HomeScreen",
+                    "Undo tasks success: status=${response.status}, courses=${response.datas.size}"
+                )
+            }.onFailure { error ->
+                Log.e("HomeScreen", "final getUndoTasks failed: ${error.message}", error)
             }
-        }
-
-        taskInfo.onSuccess { response ->
-            Log.d("HomeScreen", "Undo tasks success: status=${response.status}, courses=${response.datas.size}")
-        }.onFailure { error ->
-            Log.e("HomeScreen", "final getUndoTasks failed: ${error.message}", error)
-        }
 
         val errorMessage = taskInfo.exceptionOrNull()?.message.orEmpty()
         testByte = if (errorMessage == "Required Login") {

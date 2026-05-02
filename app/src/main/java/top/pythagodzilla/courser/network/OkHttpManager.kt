@@ -2,8 +2,10 @@ package top.pythagodzilla.courser.network
 
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
+import okhttp3.Response
 import top.pythagodzilla.courser.data.DataStoreManager
-import top.pythagodzilla.courser.data.response.TasksApiResponseClass
+import top.pythagodzilla.courser.network.response.BaseCheckLoginResponse
+import top.pythagodzilla.courser.network.response.TasksApiResponseClass
 
 
 // 创建Json解析器实例
@@ -54,7 +56,7 @@ class OkHttpManager(
         deviceName
     )
 
-    override suspend fun checkSession(
+    override suspend fun loginCheck(
         deviceUuid: String,
         appVersion: String,
         password: String,
@@ -62,7 +64,7 @@ class OkHttpManager(
         deviceVersion: String,
         username: String,
         deviceName: String
-    ) = loginModule.checkSession(
+    ) = loginModule.loginCheck(
         deviceUuid,
         appVersion,
         password,
@@ -72,10 +74,15 @@ class OkHttpManager(
         deviceName
     )
 
-    override suspend fun isSessionValid(sessionId: String) = loginModule.isSessionValid()
-
     // 获取信息接口的实现，封装到GetInfoModule
     override suspend fun getUndoTasks(): Result<TasksApiResponseClass> =
         getInfoModule.getUndoTasks()
+
+    override suspend fun checkResponseStatus(response: Response) =
+        loginModule.checkResponseNotLogin(response)
+
+    override suspend fun isSessionValid(sessionId: String): Boolean {
+        TODO("Not yet implemented")
+    }
 
 }

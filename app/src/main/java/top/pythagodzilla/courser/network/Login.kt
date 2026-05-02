@@ -4,13 +4,24 @@ import android.util.Log
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.json.JSONObject
 import top.pythagodzilla.courser.data.DataStoreManager
-import top.pythagodzilla.courser.data.response.CheckLoginDatas
 import top.pythagodzilla.courser.network.exception.HttpException
-import top.pythagodzilla.courser.network.exception.LoginStatusException
+import top.pythagodzilla.courser.network.exception.SessionExpiredException
+import top.pythagodzilla.courser.network.exception.UnknownException
+import top.pythagodzilla.courser.network.response.BaseCheckLoginResponse
+import top.pythagodzilla.courser.network.response.FailureCheckLoginResponse
+import top.pythagodzilla.courser.network.response.GetSessionResponse
+import top.pythagodzilla.courser.network.response.SuccessCheckLoginResponse
+import top.pythagodzilla.courser.network.response.checkResponseNotLogin
 
-class LoginModule(private val client: OkHttpClient = OkHttpClient(), dataStore: DataStoreManager) {
+class LoginModule(
+    private val client: OkHttpClient = OkHttpClient(),
+    private val dataStore: DataStoreManager
+) {
+
+    /**
+     * 这个方法是用于登录界面登录的主要放啊放，
+     */
     suspend fun commonLogin(
         deviceUuid: String,
         appVersion: String,
@@ -21,8 +32,55 @@ class LoginModule(private val client: OkHttpClient = OkHttpClient(), dataStore: 
         deviceName: String
     ) {
 
+        val getSessionRes = getSessionId(
+            deviceUuid,
+            appVersion,
+            password,
+            devicePlatform,
+            deviceVersion,
+            username,
+            deviceName
+        )
+
+        val loginCheckRes = loginCheck(
+            deviceUuid,
+            appVersion,
+            password,
+            devicePlatform,
+            deviceVersion,
+            username,
+            deviceName
+        )
+
+
+
+        loginCheckRes
+            .onSuccess { response ->
+                when (response) {
+                    is SuccessCheckLoginResponse -> {
+                        if (response.sessionid == getSessionRes.sessionid) {
+                            Log.d(
+                                "LoginModule",
+                                "Login successful, sessionid: ${response.sessionid}"
+                            )
+                            dataStore.saveSessionId(response.sessionid)
+                        }
+                    }
+
+                    is FailureCheckLoginResponse -> {
+                        Log.d("LoginModule", "$response")
+                    }
+                }
+            }
+            .onFailure { }
     }
 
+    /**
+     * 这个方法访问的是getSessionId接口，能获取到sessionId，返回的body有status，message和sessionid。
+     * 其中，getSessionId接口似乎不判断任何事情，你发什么都返回一个session。
+     * 所以有理由相信这个接口蛋用没有。
+     * @return GetSessionResponse 对象，包含message，status和sessionid字段
+     */
     suspend fun getSessionId(
         deviceUuid: String,
         appVersion: String,
@@ -31,87 +89,49 @@ class LoginModule(private val client: OkHttpClient = OkHttpClient(), dataStore: 
         deviceVersion: String,
         username: String,
         deviceName: String
-    ): Result<String> {
-        return try {
-            val body = FormBody.Builder()
-                .add("deviceUuid", deviceUuid)
-                .add("appVersion", appVersion)
-                .add("j_password", password)
-                .add("devicePlatform", devicePlatform)
-                .add("deviceVersion", deviceVersion)
-                .add("j_username", username)
-                .add("deviceName", deviceName)
-                .build()
+    ): GetSessionResponse {
 
-            Log.d(
-                "OkHttpManager",
-                "Request Body: deviceUuid=$deviceUuid, appVersion=$appVersion, j_password=$password, devicePlatform=$devicePlatform, deviceVersion=$deviceVersion, j_username=$username, deviceName=$deviceName"
-            )
-            Log.d("OkHttpManager", body.toString())
+        val body = FormBody.Builder()
+            .add("deviceUuid", deviceUuid)
+            .add("appVersion", appVersion)
+            .add("j_password", password)
+            .add("devicePlatform", devicePlatform)
+            .add("deviceVersion", deviceVersion)
+            .add("j_username", username)
+            .add("deviceName", deviceName)
+            .build()
 
-            val request = Request.Builder()
-                .url("http://course.buct.edu.cn/mobile/getSessionId.do")
-                .post(body)
-                .build()
+        Log.d(
+            "OkHttpManager",
+            "Request Body: deviceUuid=$deviceUuid, appVersion=$appVersion, j_password=xxxx, devicePlatform=$devicePlatform, deviceVersion=$deviceVersion, j_username=$username, deviceName=$deviceName"
+        )
 
-            val notificationRequest = Request.Builder()
-                .url("http://course.buct.edu.cn/mobile/login_check.do")
-                .post(body)
-                .build()
+        val request = Request.Builder()
+            .url("http://course.buct.edu.cn/mobile/getSessionId.do")
+            .post(body)
+            .build()
 
+        try {
             client.newCall(request).execute().use { response ->
-                val code = response.code
-                val text = response.body.string()
-                Log.d("OkHttpManager", "httpCode=$code")
-                Log.d("OkHttpManager", "responseBody=$text")
+                val content = response.body.string()
 
-                if (!response.isSuccessful) {
-                    return Result.failure(Exception("HTTP $code: $text"))
-                }
-
-                val json = JSONObject(text) // 如果这里炸，会在 catch 里看到
-                val status = json.optInt("status", 0)
-                val sessionId = json.optString("sessionid", "")
-                if (status == 1 && sessionId.isNotBlank()) {
-                } else {
-                    Result.failure<Exception>(Exception("Login failed: $text"))
-                }
-            }
-
-            client.newCall(notificationRequest).execute().use { response ->
-                val text = response.body.string()
-                Log.d(
-                    "OkHttpManager",
-                    "Notification request httpCode=${response.code}, responseBody=$text"
-                )
-                if (!response.isSuccessful) {
-                    Log.d(
-                        "OkHttpManager",
-                        "Notification request failed: HTTP ${response.code}: $text"
-                    )
-                    return Result.failure(Exception("Notification request failed: HTTP ${response.code}: $text"))
-                }
-
-                val json = JSONObject(text)
-                val status = json.optInt("status", 0)
-                if (status == 1) {
-                    return Result.success(json.optString("sessionid", ""))
-                } else {
-                    Result.failure(Exception("Notification request failed: $text"))
-                }
-
+                return json.decodeFromString(GetSessionResponse.serializer(), content)
 
             }
-
-
         } catch (e: Exception) {
-            Log.e("OkHttpManager", "Error during login: ${e::class.java.name}: ${e.message}", e)
-            Result.failure(e)
+            Log.e(
+                "OkHttpManager",
+                "Error occurred during getSessionId request: ${e::class.java.name}: ${e.message}"
+            )
+            throw e
         }
-
     }
 
-    suspend fun checkSession(
+    /**
+     * 这个方法访问的是loginCheck接口
+     * @return Result<BaseCheckLoginResponse>，成功时返回BaseCheckLoginResponse,此处的成功指的是解析成功，即有SuccessCheckLoginResponse或者FailureCheckLoginResponse对象返回。
+     * */
+    suspend fun loginCheck(
         deviceUuid: String,
         appVersion: String,
         password: String,
@@ -119,7 +139,7 @@ class LoginModule(private val client: OkHttpClient = OkHttpClient(), dataStore: 
         deviceVersion: String,
         username: String,
         deviceName: String
-    ): Result<CheckLoginDatas> {
+    ): Result<BaseCheckLoginResponse> {
         val body = FormBody.Builder()
             .add("deviceUuid", deviceUuid)
             .add("appVersion", appVersion)
@@ -138,23 +158,9 @@ class LoginModule(private val client: OkHttpClient = OkHttpClient(), dataStore: 
         try {
             client.newCall(request).execute().use { response ->
                 val content = response.body.string()
+                val result = json.decodeFromString<BaseCheckLoginResponse>(content)
 
-                if (!response.isSuccessful) {
-                    Log.e(
-                        "OkHttpManager",
-                        "Check session request failed: HTTP ${response.code}: $content"
-                    )
-                    return Result.failure(HttpException(response.code, response.message))
-                }
-
-                val status = JSONObject(content).optInt("status", 0)
-                if (status != 1) {
-                    Log.w("OkHttpManager", "")
-                    return Result.failure(LoginStatusException(response.code, status, content))
-                }
-
-                val result = json.decodeFromString<CheckLoginDatas>(content)
-                Result.success(result)
+                return Result.success(result)
             }
         } catch (e: Exception) {
             Log.e(
@@ -166,35 +172,40 @@ class LoginModule(private val client: OkHttpClient = OkHttpClient(), dataStore: 
         }
     }
 
+    /**
+     *
+     */
     suspend fun isSessionValid(): Boolean {
         val request = Request.Builder()
             .url("http://course.buct.edu.cn/mobile/stuReminderList.do")
-            .get()
             .build()
 
         try {
             client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) {
-                    Log.e(
-                        "OkHttpManager",
-                        "Error happened when check session. response not succeed. HTTP ${response.code}: ${response.body.string()}"
-                    )
-                    return false
-                }
-
-                val text = response.body.string()
-                val json = JSONObject(text)
-                val status = json.optInt("status", -2)
-
-                return status == 1
+                val result = checkResponseNotLogin(response)
+                result
+                    .onSuccess {
+                        Log.d("OkHttpManager", "Session is valid.")
+                        return true
+                    }
+                    // 先做成功的吧，去他妈的鲁棒性
+                    .onFailure { exception ->
+                        when (exception) {
+                            is HttpException -> {}
+                            is SessionExpiredException -> {}
+                            is UnknownException -> {}
+                        }
+                    }
             }
         } catch (e: Exception) {
             Log.e(
                 "OkHttpManager",
-                "Error during session validation: ${e::class.java.name}: ${e.message}",
+                "Error occurred during session valid check request: ${e::class.java.name}: ${e.message}",
                 e
             )
-            return false
         }
+        return false
     }
+
+
 }

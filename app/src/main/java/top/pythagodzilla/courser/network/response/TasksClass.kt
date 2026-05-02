@@ -1,4 +1,4 @@
-package top.pythagodzilla.courser.data.response
+package top.pythagodzilla.courser.network.response
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName

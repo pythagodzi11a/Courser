@@ -33,15 +33,15 @@ class LoginModule(
         deviceName: String
     ): Result<String> {
 
-        val getSessionRes = getSessionId(
-            deviceUuid,
-            appVersion,
-            password,
-            devicePlatform,
-            deviceVersion,
-            username,
-            deviceName
-        )
+//        val getSessionRes = getSessionId(
+//            deviceUuid,
+//            appVersion,
+//            password,
+//            devicePlatform,
+//            deviceVersion,
+//            username,
+//            deviceName
+//        )
 
         val loginCheckRes = loginCheck(
             deviceUuid,
@@ -59,7 +59,8 @@ class LoginModule(
             .onSuccess { response ->
                 when (response) {
                     is SuccessCheckLoginResponse -> {
-                        if (response.sessionid == getSessionRes.sessionid) {
+//                        if (response.sessionid == getSessionRes.sessionid) {
+                        if (response.sessionid.isNotEmpty()) {
                             Log.d(
                                 "LoginModule",
                                 "Login successful, sessionid: ${response.sessionid}"

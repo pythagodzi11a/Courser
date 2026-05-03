@@ -32,6 +32,7 @@ fun LoginScreen(client: NetworkManager, dataStore: DataStoreManager, navControll
     var message by rememberSaveable { mutableStateOf("") }
 
     var buttonLoading by rememberSaveable { mutableStateOf(false) }
+    var loginStatus by rememberSaveable { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
 
@@ -74,7 +75,7 @@ fun LoginScreen(client: NetworkManager, dataStore: DataStoreManager, navControll
 
                             result.onSuccess { result ->
                                 message = result
-                                navController.navigate("pages")
+                                loginStatus = true
                             }
                                 .onFailure {
                                     message = it.message ?: it.toString()
@@ -86,6 +87,10 @@ fun LoginScreen(client: NetworkManager, dataStore: DataStoreManager, navControll
                 enabled = !buttonLoading,
                 modifier = Modifier.padding(top = 16.dp)
             ) {
+                if (loginStatus) {
+                    navController.navigate("pages")
+                }
+
                 if (buttonLoading) Text("登录中...")
                 else Text("登录")
             }

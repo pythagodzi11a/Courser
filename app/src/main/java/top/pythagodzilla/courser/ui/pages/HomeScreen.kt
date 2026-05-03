@@ -48,7 +48,7 @@ fun HomeScreen(client: NetworkManager, dataStore: DataStoreManager) {
 
 
     Surface(modifier = Modifier.fillMaxSize()) {
-        LazyColumn() {xzl
+        LazyColumn() {
         }
     }
 }

@@ -71,8 +71,6 @@ fun AppRoot(dataStore: DataStoreManager, httpClient: OkHttpClient) {
 
         haveLoginInfoStatus = haveLoginInfo(dataStore)
 
-//        delay(1000)
-
         if (isFirstStart || !haveLoginInfoStatus) {
             // 第一次启动，进入login
             Log.d("AppRoot", "第一次启动，进入login")
@@ -82,7 +80,7 @@ fun AppRoot(dataStore: DataStoreManager, httpClient: OkHttpClient) {
         } else {
             // 已经登录过，进入home
             Log.d("AppRoot", "查询到用户信息，进入home")
-            startDestination = "page"
+            startDestination = "pages"
         }
     }
 

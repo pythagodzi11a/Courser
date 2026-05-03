@@ -24,12 +24,18 @@ class GetInfoModule(private val client: OkHttpClient = OkHttpClient()) {
 
         try {
             client.newCall(request).execute().use { response ->
-                val finalResponse = checkResponseNotLogin(response)
+                val content = response.body.string()
 
-                finalResponse
-                    .onSuccess { response ->
+                val finalContent = checkResponseNotLogin(content)
 
-                        return Result.success(json.decodeFromString<TasksApiResponseClass>(response.body.string()))
+                finalContent
+                    .onSuccess { currentContent ->
+
+                        return Result.success(
+                            json.decodeFromString<TasksApiResponseClass>(
+                                currentContent
+                            )
+                        )
                     }
                     .onFailure { exception ->
                         when (exception) {

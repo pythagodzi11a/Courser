@@ -76,6 +76,7 @@ fun LoginScreen(client: NetworkManager, dataStore: DataStoreManager, navControll
                             result.onSuccess { result ->
                                 message = result
                                 loginStatus = true
+                                dataStore.addLoginInfo(username, password)
                             }
                                 .onFailure {
                                     message = it.message ?: it.toString()

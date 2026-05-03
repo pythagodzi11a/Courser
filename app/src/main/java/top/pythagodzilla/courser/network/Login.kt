@@ -195,7 +195,9 @@ class LoginModule(
 
         try {
             client.newCall(request).execute().use { response ->
-                val result = checkResponseNotLogin(response)
+                val content = response.body.string()
+
+                val result = checkResponseNotLogin(content)
                 result
                     .onSuccess {
                         Log.d("OkHttpManager", "Session is valid.")

@@ -15,10 +15,9 @@ import top.pythagodzilla.courser.network.exception.UnknownException
  * @return Result<String>,成功时返回"Success",失败返回Exception，异常类型有几种，自己判断是哪种。
  * @param response Response对象，直接传入response判断即可。
  * */
-suspend fun checkResponseNotLogin(response: Response): Result<Response> {
+suspend fun checkResponseNotLogin(response: String): Result<String> {
 
-    val text = response.body.string()
-    val jsonObj = JSONObject(text)
+    val jsonObj = JSONObject(response)
 
     val error = jsonObj.optJSONArray("error")
     val statusCode = jsonObj.opt("status")
@@ -37,7 +36,7 @@ suspend fun checkResponseNotLogin(response: Response): Result<Response> {
         if (statusCode.optInt(0) == -2 && error.optString(0) == "请登录！") {
             return Result.failure(
                 SessionExpiredException(
-                    response.code,
+                    -1,
                     error.optString(0),
                     statusCode.optInt(0)
                 )
@@ -47,8 +46,8 @@ suspend fun checkResponseNotLogin(response: Response): Result<Response> {
 
     return Result.failure(
         UnknownException(
-            response.code,
-            "HTTP error occurred: $text"
+            -1,
+            "HTTP error occurred: $response"
         )
     )
 }

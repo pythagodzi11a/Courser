@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,7 +18,6 @@ import kotlinx.coroutines.withContext
 import top.pythagodzilla.courser.data.DataStoreManager
 import top.pythagodzilla.courser.network.NetworkManager
 import top.pythagodzilla.courser.network.response.TasksApiResponseClass
-import top.pythagodzilla.courser.ui.composable.TaskCard
 
 
 @Composable
@@ -48,6 +48,8 @@ fun HomeScreen(client: NetworkManager, dataStore: DataStoreManager) {
 
 
     Surface(modifier = Modifier.fillMaxSize()) {
+        Text(text = testByte)
+        Text(text = taskInfo.toString())
         LazyColumn() {
         }
     }

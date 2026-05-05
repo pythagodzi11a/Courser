@@ -14,18 +14,34 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import top.pythagodzilla.courser.network.response.HomeworkClass
-import top.pythagodzilla.courser.network.response.TaskItem
-import java.time.LocalDateTime
+import androidx.compose.ui.unit.sp
+import top.pythagodzilla.courser.ui.types.ExamUIClass
+import top.pythagodzilla.courser.ui.types.HomeworkUIClass
+import top.pythagodzilla.courser.ui.types.TaskUITypes
 
 @Composable
-fun TaskCard(task: TaskItem) {
+fun TaskCard(task: TaskUITypes) {
+
+    when (task) {
+        is HomeworkUIClass -> {
+            HomeworkCard(task)
+        }
+
+        is ExamUIClass -> {
+            ExamCard(task)
+        }
+    }
+
+}
+
+@Composable
+private fun ExamCard(task: ExamUIClass) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors()
+        colors = CardDefaults.cardColors(),
+        onClick = {}
     ) {
         Row(
             modifier = Modifier
@@ -34,11 +50,11 @@ fun TaskCard(task: TaskItem) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = task.title,
+                text = task.courseName,
                 style = MaterialTheme.typography.titleMedium
             )
             Text(
-                text = task.endTime.toString(),
+                text = task.endTime,
                 style = MaterialTheme.typography.titleSmall
             )
         }
@@ -51,11 +67,61 @@ fun TaskCard(task: TaskItem) {
                 .padding(4.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Text(text = task.startTime.toString())
-            Text(text = task.publishStatus.toString())
+            Text(
+                text = task.title,
+                style = MaterialTheme.typography.bodyLarge,
+                fontSize = 30.sp
+            )
+
+            Spacer(modifier = Modifier.padding(4.dp))
+
+            Text(text = task.startTime)
+        }
+    }
+}
+
+@Composable
+private fun HomeworkCard(task: HomeworkUIClass) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp),
+        colors = CardDefaults.cardColors(),
+        onClick = {}
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = task.courseName,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = task.endTime,
+                style = MaterialTheme.typography.titleSmall
+            )
         }
 
+        Spacer(modifier = Modifier.padding(4.dp))
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Text(
+                text = task.title,
+                style = MaterialTheme.typography.bodyLarge,
+                fontSize = 30.sp
+            )
+            Text(text = task.startTime)
+        }
     }
+
 }
 
 
@@ -66,16 +132,24 @@ fun TaskCard(task: TaskItem) {
 )
 @Composable
 fun TaskCardPreview() {
-    TaskCard(
-        HomeworkClass(
-            id = 1,
-            title = "Task Title",
-            startTime = LocalDateTime.parse("2024-06-01T08:00:00"),
-            endTime = LocalDateTime.parse("2024-06-07T23:59:59"),
-            publishStatus = true,
-            revision = true,
-            fullmark = 1,
-            lessId = 114514,
+    Column() {
+        TaskCard(
+            HomeworkUIClass(
+
+                title = "Task Title",
+                startTime = "2024-06-01T08:00:00",
+                endTime = "2024-06-07T23:59:59",
+                courseName = "Course Name"
+            )
         )
-    )
+        Spacer(modifier = Modifier.padding(4.dp))
+        TaskCard(
+            ExamUIClass(
+                title = "Exam Title",
+                startTime = "2024-06-01T08:00:00",
+                endTime = "2024-06-07T23:59:59",
+                courseName = "Course Name"
+            )
+        )
+    }
 }

@@ -3,6 +3,7 @@ package top.pythagodzilla.courser.network
 import android.util.Log
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import top.pythagodzilla.courser.network.exception.ClientException
 import top.pythagodzilla.courser.network.exception.HttpException
 import top.pythagodzilla.courser.network.exception.SessionExpiredException
 import top.pythagodzilla.courser.network.exception.UnknownException
@@ -73,7 +74,7 @@ class GetInfoModule(private val client: OkHttpClient = OkHttpClient()) {
                 "getUndoTasks exception: ${e::class.java.simpleName}: ${e.message}",
                 e
             )
-            return Result.failure(Exception("Failed to get undo tasks: ${e.message}", e))
+            return Result.failure(ClientException("Failed to get undo tasks: ${e.message}"))
         }
     }
 }

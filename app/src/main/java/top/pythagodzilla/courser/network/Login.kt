@@ -35,6 +35,18 @@ class LoginModule(
 
         Log.d("LoginModule", "Starting commonLogin with username: $username")
 
+        val getSessionSession = getSessionId(
+            deviceUuid,
+            appVersion,
+            password,
+            devicePlatform,
+            deviceVersion,
+            username,
+            deviceName
+        )
+
+        dataStore.saveSessionId(getSessionSession.sessionid)
+
         val loginCheckRes = loginCheck(
             deviceUuid,
             appVersion,

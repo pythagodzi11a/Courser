@@ -23,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import top.pythagodzilla.courser.data.DataStoreManager
+import top.pythagodzilla.courser.data.dataStore
 import top.pythagodzilla.courser.network.NetworkManager
 import top.pythagodzilla.courser.network.OkHttpManager
 import top.pythagodzilla.courser.network.SessionCookieInterceptor
@@ -37,10 +38,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val dataStore = DataStoreManager(applicationContext)
-        val client = OkHttpClient.Builder()
-            .addInterceptor(SessionCookieInterceptor(dataStore))
-            .build()
+        val dataStore = (application as CourserApplication).dataStore
+        val client = (application as CourserApplication).client
 
         setContent {
             CourserTheme {
@@ -52,15 +51,12 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun AppRoot(dataStore: DataStoreManager, httpClient: OkHttpClient) {
+fun AppRoot(dataStore: DataStoreManager, client: NetworkManager) {
 
     // 没有做登录判断，先默认为true，后续要记得改
     var isFirstStart by rememberSaveable { mutableStateOf(true) }
     var haveLoginInfoStatus by rememberSaveable { mutableStateOf(true) }
     var startDestination by rememberSaveable { mutableStateOf<String?>(null) }
-
-    val client: NetworkManager =
-        remember { OkHttpManager(client = httpClient, dataStore = dataStore) }
 
     val navController = rememberNavController()
 
@@ -96,7 +92,7 @@ fun AppRoot(dataStore: DataStoreManager, httpClient: OkHttpClient) {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("login") { LoginScreen(client, dataStore, navController) }
-            composable("pages") { PageContainer(client, dataStore) }
+            composable("pages") { PageContainer()}
         }
     }
 }

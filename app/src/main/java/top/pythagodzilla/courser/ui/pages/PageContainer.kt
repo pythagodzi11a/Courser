@@ -16,7 +16,7 @@ import top.pythagodzilla.courser.data.DataStoreManager
 import top.pythagodzilla.courser.network.NetworkManager
 
 @Composable
-fun PageContainer(client: NetworkManager, dataStore: DataStoreManager) {
+fun PageContainer() {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
 
     NavigationSuiteScaffold(
@@ -34,8 +34,7 @@ fun PageContainer(client: NetworkManager, dataStore: DataStoreManager) {
         }
     ) {
         when (currentDestination) {
-            AppDestinations.HOME -> HomeScreen(client, dataStore)
-//            AppDestinations.PROFILE -> LoginScreen(client, dataStore, navController = )
+            AppDestinations.HOME -> HomeScreen()
             AppDestinations.PROFILE -> Text("profile")
         }
     }

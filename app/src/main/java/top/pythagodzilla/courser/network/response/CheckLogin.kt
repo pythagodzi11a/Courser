@@ -49,7 +49,7 @@ data class FailureCheckLoginDatas(
 
 @Serializable
 data class UserInfo(
-    val photoFileId: String,
+    val photoFileId: String = "",
     val lastLoginDate: Time,
     val loginTimes: Int,
     val user: User,

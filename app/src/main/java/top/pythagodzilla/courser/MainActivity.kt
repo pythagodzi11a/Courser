@@ -91,7 +91,7 @@ fun AppRoot(dataStore: DataStoreManager, client: NetworkManager) {
             startDestination = startDestination!!,
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable("login") { LoginScreen(client, dataStore, navController) }
+            composable("login") { LoginScreen(  navController = navController) }
             composable("pages") { PageContainer()}
         }
     }

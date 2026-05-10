@@ -17,6 +17,7 @@ import top.pythagodzilla.courser.network.response.HomeworkClass
 import top.pythagodzilla.courser.ui.types.ExamUIClass
 import top.pythagodzilla.courser.ui.types.HomeworkUIClass
 import top.pythagodzilla.courser.ui.types.TaskUITypes
+import java.time.format.DateTimeFormatter
 
 class HomeScreenViewModel(application: Application) : AndroidViewModel(application) {
     val client = (application as CourserApplication).client
@@ -44,8 +45,16 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
                                         HomeworkUIClass(
                                             title = task.title,
                                             courseName = items.courseName,
-                                            startTime = task.startTime.toString(),
-                                            endTime = task.endTime.toString(),
+                                            startTime = task.startTime.format(
+                                                DateTimeFormatter.ofPattern(
+                                                    "yyyy-MM-dd HH:mm"
+                                                )
+                                            ),
+                                            endTime = task.endTime.format(
+                                                DateTimeFormatter.ofPattern(
+                                                    "yyyy-MM-dd HH:mm"
+                                                )
+                                            ),
                                         )
                                     )
                                 }
@@ -55,8 +64,16 @@ class HomeScreenViewModel(application: Application) : AndroidViewModel(applicati
                                         ExamUIClass(
                                             title = task.title,
                                             courseName = items.courseName,
-                                            startTime = task.startTime.toString(),
-                                            endTime = task.endTime.toString()
+                                            startTime = task.startTime.format(
+                                                DateTimeFormatter.ofPattern(
+                                                    "yyyy-MM-dd HH:mm"
+                                                )
+                                            ),
+                                            endTime = task.endTime.format(
+                                                DateTimeFormatter.ofPattern(
+                                                    "yyyy-MM-dd HH:mm"
+                                                )
+                                            )
                                         )
                                     )
                                 }

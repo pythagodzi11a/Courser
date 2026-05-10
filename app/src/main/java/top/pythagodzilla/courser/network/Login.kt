@@ -44,6 +44,9 @@ class LoginModule(
             username,
             deviceName
         )
+        if (getSessionSession.status == 0){
+            return Result.failure(StringException("Failed to get session ID: ${getSessionSession.message}"))
+        }
 
         dataStore.saveSessionId(getSessionSession.sessionid)
 
@@ -172,10 +175,20 @@ class LoginModule(
 
         try {
             client.newCall(request).execute().use { response ->
-                val content = response.body.string()
-                val result = json.decodeFromString<BaseCheckLoginResponse>(content)
+                if (response.isSuccessful) {
+                    val content = response.body.string()
+                    val result = json.decodeFromString<BaseCheckLoginResponse>(content)
 
-                return Result.success(result)
+                    return Result.success(result)
+                } else {
+                    return Result.failure(
+                        HttpException(
+                            response.code,
+                            "HTTP error: ${response.message}"
+                        )
+                    )
+                }
+
             }
         } catch (e: Exception) {
             Log.e(

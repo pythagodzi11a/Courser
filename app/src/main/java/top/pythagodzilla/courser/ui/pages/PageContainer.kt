@@ -1,8 +1,8 @@
 package top.pythagodzilla.courser.ui.pages
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
@@ -32,8 +32,8 @@ fun PageContainer() {
         }
     ) {
         when (currentDestination) {
-            AppDestinations.HOME -> HomeScreen()
-            AppDestinations.PROFILE -> Text("profile")
+            AppDestinations.HOME -> TasksScreen()
+            AppDestinations.PROFILE -> ProfileScreen()
         }
     }
 }
@@ -43,6 +43,6 @@ enum class AppDestinations(
     val icon: ImageVector,
     val contentDescription: String
 ) {
-    HOME("home", Icons.Default.Home, "home"),
-    PROFILE("profile", Icons.Default.AccountBox, "profile")
+    HOME("Tasks", Icons.Default.Edit, "home"),
+    PROFILE("profile", Icons.Default.AccountCircle, "profile")
 }

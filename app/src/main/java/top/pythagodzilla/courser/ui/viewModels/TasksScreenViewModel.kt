@@ -19,7 +19,7 @@ import top.pythagodzilla.courser.ui.types.HomeworkUIClass
 import top.pythagodzilla.courser.ui.types.TaskUITypes
 import java.time.format.DateTimeFormatter
 
-class HomeScreenViewModel(application: Application) : AndroidViewModel(application) {
+class TasksScreenViewModel(application: Application) : AndroidViewModel(application) {
     val client = (application as CourserApplication).client
     val dataStore = (application as CourserApplication).dataStore
 

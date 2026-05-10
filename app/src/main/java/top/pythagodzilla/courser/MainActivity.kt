@@ -5,14 +5,15 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -21,12 +22,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
 import top.pythagodzilla.courser.data.DataStoreManager
-import top.pythagodzilla.courser.data.dataStore
 import top.pythagodzilla.courser.network.NetworkManager
-import top.pythagodzilla.courser.network.OkHttpManager
-import top.pythagodzilla.courser.network.SessionCookieInterceptor
 import top.pythagodzilla.courser.ui.LoginScreen
 import top.pythagodzilla.courser.ui.SplashScreen
 import top.pythagodzilla.courser.ui.pages.PageContainer
@@ -85,14 +82,18 @@ fun AppRoot(dataStore: DataStoreManager, client: NetworkManager) {
         return
     }
 
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+    Scaffold(
+        modifier = Modifier.fillMaxSize()
+    ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = startDestination!!,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
         ) {
-            composable("login") { LoginScreen(  navController = navController) }
-            composable("pages") { PageContainer()}
+            composable("login") { LoginScreen(navController = navController) }
+            composable("pages") { PageContainer() }
         }
     }
 }

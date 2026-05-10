@@ -1,6 +1,7 @@
 package top.pythagodzilla.courser.ui.composable
 
-import android.widget.Space
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,11 +13,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -30,12 +34,15 @@ import top.pythagodzilla.courser.ui.types.TaskUITypes
 @Composable
 fun TaskCard(task: TaskUITypes) {
 
+    var expend by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
+            .animateContentSize()
             .fillMaxWidth()
             .padding(8.dp),
-        colors = CardDefaults.cardColors(),
-        onClick = {}
+//        colors = CardDefaults.cardColors(),
+        onClick = { expend = !expend },
     ) {
         Row(
             modifier = Modifier
@@ -54,30 +61,33 @@ fun TaskCard(task: TaskUITypes) {
             Spacer(modifier = Modifier.width(24.dp))
             Surface(
                 shape = RoundedCornerShape(corner = CornerSize(50)),
-                color = when(task){
+                color = when (task) {
                     is HomeworkUIClass -> MaterialTheme.colorScheme.primary
-                    is ExamUIClass -> MaterialTheme.colorScheme.secondary
+                    is ExamUIClass -> MaterialTheme.colorScheme.tertiary
                 }
             ) {
                 Text(
-                    text = when(task){
+                    text = when (task) {
                         is HomeworkUIClass -> "作业"
                         is ExamUIClass -> "考试"
                     },
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = when(task){
+                        is HomeworkUIClass -> MaterialTheme.colorScheme.onPrimary
+                        is ExamUIClass -> MaterialTheme.colorScheme.onTertiary
+                    },
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                     style = MaterialTheme.typography.labelMedium
                 )
             }
         }
 
-//        Spacer(modifier = Modifier.height(8.dp))
+
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
-//            verticalArrangement = Arrangement.spacedBy(2.dp)
+
         ) {
             Text(
                 text = task.title,
@@ -92,8 +102,14 @@ fun TaskCard(task: TaskUITypes) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
-            ){
-                Text(text = "开始时间："+task.endTime)
+            ) {
+                Text(text = "截止时间：" + task.endTime)
+            }
+        }
+
+        AnimatedVisibility(visible = expend) {
+            Column(modifier = Modifier.padding(12.dp)) {
+                Text(text = "开始时间：" + task.startTime)
             }
         }
     }

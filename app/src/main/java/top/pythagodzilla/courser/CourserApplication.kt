@@ -3,6 +3,7 @@ package top.pythagodzilla.courser
 import android.app.Application
 import okhttp3.OkHttpClient
 import top.pythagodzilla.courser.data.DataStoreManager
+import top.pythagodzilla.courser.data.dataBase.TaskDataBase
 import top.pythagodzilla.courser.network.NetworkManager
 import top.pythagodzilla.courser.network.OkHttpManager
 import top.pythagodzilla.courser.network.SessionCookieInterceptor
@@ -20,5 +21,9 @@ class CourserApplication : Application() {
             client = okHttpClient,
             dataStore = dataStore
         )
+    }
+
+    val database: TaskDataBase by lazy {
+        TaskDataBase.getDatabase(applicationContext)
     }
 }

@@ -46,6 +46,8 @@ interface NetworkManager {
     suspend fun isSessionValid(sessionId: String): Boolean
 
     // 获取信息相关接口
+
+    suspend fun getUndoTasksString(): Result<String>
     suspend fun getUndoTasks(): Result<TasksApiResponseClass>
 }
 

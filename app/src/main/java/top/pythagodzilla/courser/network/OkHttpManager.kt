@@ -2,9 +2,7 @@ package top.pythagodzilla.courser.network
 
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
-import okhttp3.Response
 import top.pythagodzilla.courser.data.DataStoreManager
-import top.pythagodzilla.courser.network.response.BaseCheckLoginResponse
 import top.pythagodzilla.courser.network.response.TasksApiResponseClass
 
 
@@ -77,6 +75,8 @@ class OkHttpManager(
     // 获取信息接口的实现，封装到GetInfoModule
     override suspend fun getUndoTasks(): Result<TasksApiResponseClass> =
         getInfoModule.getUndoTasks()
+
+    override suspend fun getUndoTasksString(): Result<String> = getInfoModule.getUndoTasksString()
 
 
     override suspend fun isSessionValid(sessionId: String): Boolean = loginModule.isSessionValid()

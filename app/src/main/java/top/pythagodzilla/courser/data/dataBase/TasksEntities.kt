@@ -9,5 +9,5 @@ data class TasksEntities(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val tasksList: String,
-    val getTime: LocalDateTime = LocalDateTime.now()
+    val savedAt: LocalDateTime = LocalDateTime.now()
 )

@@ -67,13 +67,13 @@ class LoginModule(
                         if (response.sessionid.isNotEmpty()) {
                             Log.d(
                                 "LoginModule",
-                                "Login successful, sessionid: ${response.sessionid}"
+                                "Login successful, session: ${response.sessionid}"
                             )
                             dataStore.saveSessionId(response.sessionid)
 
                             return Result.success(response.sessionid)
                         }
-                        Log.d("LoginModule", "Login successful, but sessionid is empty")
+                        Log.d("LoginModule", "Login successful, but session is empty")
                     }
 
                     is FailureCheckLoginResponse -> {

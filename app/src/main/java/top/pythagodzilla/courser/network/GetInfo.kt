@@ -14,6 +14,36 @@ class GetInfoModule(private val client: OkHttpClient = OkHttpClient()) {
 
     /**
      * 获取待办任务列表
+     * @return Result<String>
+     */
+    suspend fun getUndoTasksString(): Result<String> {
+        Log.d("GetInfoModule", "Start get undo tasks")
+
+        val request = Request.Builder()
+            .url("http://course.buct.edu.cn/mobile/stuUnDoTaskList.do")
+            .build()
+
+        try {
+            client.newCall(request).execute().use { response ->
+                val content = response.body.string()
+                val finalContent = checkResponseNotLogin(content)
+
+                finalContent.onSuccess {
+                    return Result.success(it)
+                }.onFailure {
+                    return Result.failure(it)
+                }
+
+                return Result.failure(UnknownException(response.code, response.body.toString()))
+            }
+        } catch (e: Exception) {
+            Log.e("GetInfoModule", e.toString())
+            return Result.failure(UnknownException(-1, e.toString()))
+        }
+    }
+
+    /**
+     * 获取待办任务列表
      * @return Result 包含 TasksApiResponseClass 或异常
      */
     suspend fun getUndoTasks(): Result<TasksApiResponseClass> {

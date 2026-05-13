@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,7 +21,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import top.pythagodzilla.courser.data.DataStoreManager
+import top.pythagodzilla.courser.data.dataStore.DataStoreManager
 import top.pythagodzilla.courser.network.NetworkManager
 import top.pythagodzilla.courser.ui.LoginScreen
 import top.pythagodzilla.courser.ui.SplashScreen

@@ -4,7 +4,7 @@ import android.util.Log
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
-import top.pythagodzilla.courser.data.DataStoreManager
+import top.pythagodzilla.courser.data.dataStore.DataStoreManager
 import top.pythagodzilla.courser.network.response.BaseCheckLoginResponse
 import top.pythagodzilla.courser.network.response.GetSessionResponse
 import top.pythagodzilla.courser.network.response.TasksApiResponseClass

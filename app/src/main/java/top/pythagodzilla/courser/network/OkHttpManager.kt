@@ -2,7 +2,7 @@ package top.pythagodzilla.courser.network
 
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
-import top.pythagodzilla.courser.data.DataStoreManager
+import top.pythagodzilla.courser.data.dataStore.DataStoreManager
 import top.pythagodzilla.courser.network.response.TasksApiResponseClass
 
 

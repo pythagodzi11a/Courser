@@ -2,7 +2,7 @@ package top.pythagodzilla.courser.ui.pages
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Task
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
@@ -43,6 +43,6 @@ enum class AppDestinations(
     val icon: ImageVector,
     val contentDescription: String
 ) {
-    HOME("Tasks", Icons.Default.Edit, "home"),
-    PROFILE("profile", Icons.Default.AccountCircle, "profile")
+    HOME("任务", Icons.Default.Task, "任务"),
+    PROFILE("个人", Icons.Default.AccountCircle, "个人")
 }

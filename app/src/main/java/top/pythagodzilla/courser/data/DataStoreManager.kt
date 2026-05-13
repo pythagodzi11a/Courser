@@ -19,8 +19,6 @@ class DataStoreManager(private val context: Context) {
     private val passwordKey = stringPreferencesKey("password")
     private val fistStartKey = booleanPreferencesKey("first_start")
 
-//    val sessionFlow: Flow<String?> = context.dataStore.data.map { it[sessionKey] }
-
 
     suspend fun saveSessionId(sessionId: String) {
         context.dataStore.edit { it[sessionKey] = sessionId }

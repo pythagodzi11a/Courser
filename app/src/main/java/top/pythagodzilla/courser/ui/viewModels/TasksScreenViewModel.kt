@@ -79,6 +79,7 @@ class TasksScreenViewModel(application: Application) : AndroidViewModel(applicat
         val tasks = json.decodeFromString<TasksApiResponseClass>(rawJson)
         val list = mutableListOf<TaskUITypes>()
 
+
         tasks.datas.forEach { items ->
             items.reminderList.forEach { task ->
                 when (task) {
@@ -125,87 +126,4 @@ class TasksScreenViewModel(application: Application) : AndroidViewModel(applicat
 
         return list
     }
-
-
-//    private fun loadTasks() {
-//        viewModelScope.launch {
-//            try {
-//                val result = withContext(Dispatchers.IO) { client.getUndoTasks() }
-//
-//                result.onSuccess { response ->
-//                    val list = mutableListOf<TaskUITypes>()
-//                    response.datas.forEach { items ->
-//                        items.reminderList.forEach { task ->
-//                            when (task) {
-//                                is HomeworkClass -> {
-//                                    list.add(
-//                                        HomeworkUIClass(
-//                                            title = task.title,
-//                                            courseName = items.courseName,
-//                                            startTime = task.startTime.format(
-//                                                DateTimeFormatter.ofPattern(
-//                                                    "yyyy-MM-dd HH:mm"
-//                                                )
-//                                            ),
-//                                            endTime = task.endTime.format(
-//                                                DateTimeFormatter.ofPattern(
-//                                                    "yyyy-MM-dd HH:mm"
-//                                                )
-//                                            ),
-//                                        )
-//                                    )
-//                                }
-//
-//                                is ExamClass -> {
-//                                    list.add(
-//                                        ExamUIClass(
-//                                            title = task.title,
-//                                            courseName = items.courseName,
-//                                            startTime = task.startTime.format(
-//                                                DateTimeFormatter.ofPattern(
-//                                                    "yyyy-MM-dd HH:mm"
-//                                                )
-//                                            ),
-//                                            endTime = task.endTime.format(
-//                                                DateTimeFormatter.ofPattern(
-//                                                    "yyyy-MM-dd HH:mm"
-//                                                )
-//                                            )
-//                                        )
-//                                    )
-//                                }
-//                            }
-//                        }
-//                    }
-//                    _tasksUIList.value = list
-//                }
-//                    .onFailure { error ->
-//                        Log.e("HomeScreen", "final getUndoTasks failed: ${error.message}", error)
-//                        when (error) {
-//                            is ClientException -> {
-//
-//                            }
-//
-//                            is SessionExpiredException -> {
-////                                testByte = "Session expired, please login again."
-//                                withContext(Dispatchers.IO) {
-//                                    val (username, password) = dataStore.readLoginInfo()
-//
-//                                    if (!username.isNullOrEmpty() && !password.isNullOrEmpty()) {
-//                                        val result = client.commonLogin(
-//                                            username = username,
-//                                            password = password
-//                                        )
-//                                        result.onSuccess { loadTasks() }
-//                                            .onFailure { }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//            } catch (e: Exception) {
-//                Log.e("HomeScreenViewModel", "Failed to load tasks: ${e.message}")
-//            }
-//        }
-//    }
 }

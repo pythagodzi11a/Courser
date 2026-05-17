@@ -66,6 +66,7 @@ fun AppRoot(dataStore: DataStoreManager, client: NetworkManager) {
         if (isFirstStart || !haveLoginInfoStatus) {
             // 第一次启动，进入login
             Log.d("AppRoot", "第一次启动，进入login")
+            dataStore.detectAndSaveDeviceUuid()
 
             dataStore.setFirstStart()
             startDestination = "login"
@@ -92,7 +93,7 @@ fun AppRoot(dataStore: DataStoreManager, client: NetworkManager) {
                 .consumeWindowInsets(innerPadding)
         ) {
             composable("login") { LoginScreen(navController = navController) }
-            composable("pages") { PageContainer() }
+            composable("pages") { PageContainer(navController = navController) }
         }
     }
 }

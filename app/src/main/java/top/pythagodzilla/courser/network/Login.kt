@@ -9,7 +9,7 @@ import top.pythagodzilla.courser.network.exception.HttpException
 import top.pythagodzilla.courser.network.exception.SessionExpiredException
 import top.pythagodzilla.courser.network.exception.StringException
 import top.pythagodzilla.courser.network.exception.UnknownException
-import top.pythagodzilla.courser.network.response.BaseCheckLoginResponse
+import top.pythagodzilla.courser.network.response.BaseCheckResponse
 import top.pythagodzilla.courser.network.response.FailureCheckLoginResponse
 import top.pythagodzilla.courser.network.response.GetSessionResponse
 import top.pythagodzilla.courser.network.response.SuccessCheckLoginResponse
@@ -24,7 +24,6 @@ class LoginModule(
      * 这个方法是用于登录界面登录的主要方法，同时会自动把session存入DataStore.
      */
     suspend fun commonLogin(
-        deviceUuid: String,
         appVersion: String,
         password: String,
         devicePlatform: String,
@@ -36,7 +35,6 @@ class LoginModule(
         Log.d("LoginModule", "Starting commonLogin with username: $username")
 
         val getSessionSession = getSessionId(
-            deviceUuid,
             appVersion,
             password,
             devicePlatform,
@@ -44,14 +42,14 @@ class LoginModule(
             username,
             deviceName
         )
-        if (getSessionSession.status == 0){
+
+        if (getSessionSession.status == 0) {
             return Result.failure(StringException("Failed to get session ID: ${getSessionSession.message}"))
         }
 
         dataStore.saveSessionId(getSessionSession.sessionid)
 
         val loginCheckRes = loginCheck(
-            deviceUuid,
             appVersion,
             password,
             devicePlatform,
@@ -69,7 +67,11 @@ class LoginModule(
                                 "LoginModule",
                                 "Login successful, session: ${response.sessionid}"
                             )
+
                             dataStore.saveSessionId(response.sessionid)
+                            dataStore.saveRealName(response.datas.userinfo.user.username)
+                            dataStore.saveLoginTimes(response.datas.userinfo.loginTimes)
+                            dataStore.savePhotoField(response.datas.userinfo.photoFileId)
 
                             return Result.success(response.sessionid)
                         }
@@ -95,7 +97,6 @@ class LoginModule(
      * @return GetSessionResponse 对象，包含message，status和sessionid字段
      */
     suspend fun getSessionId(
-        deviceUuid: String,
         appVersion: String,
         password: String,
         devicePlatform: String,
@@ -103,7 +104,7 @@ class LoginModule(
         username: String,
         deviceName: String
     ): GetSessionResponse {
-
+        val deviceUuid = dataStore.readDeviceUuid() ?: "unknown_device_uuid"
         val body = FormBody.Builder()
             .add("deviceUuid", deviceUuid)
             .add("appVersion", appVersion)
@@ -150,14 +151,15 @@ class LoginModule(
      * @return Result<BaseCheckLoginResponse>，成功时返回BaseCheckLoginResponse,此处的成功指的是解析成功，即有SuccessCheckLoginResponse或者FailureCheckLoginResponse对象返回。
      * */
     suspend fun loginCheck(
-        deviceUuid: String,
         appVersion: String,
         password: String,
         devicePlatform: String,
         deviceVersion: String,
         username: String,
         deviceName: String
-    ): Result<BaseCheckLoginResponse> {
+    ): Result<BaseCheckResponse> {
+        val deviceUuid = dataStore.readDeviceUuid() ?: "unknown_device_uuid"
+
         val body = FormBody.Builder()
             .add("deviceUuid", deviceUuid)
             .add("appVersion", appVersion)
@@ -177,7 +179,7 @@ class LoginModule(
             client.newCall(request).execute().use { response ->
                 if (response.isSuccessful) {
                     val content = response.body.string()
-                    val result = json.decodeFromString<BaseCheckLoginResponse>(content)
+                    val result = json.decodeFromString<BaseCheckResponse>(content)
 
                     return Result.success(result)
                 } else {

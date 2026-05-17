@@ -5,7 +5,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
 import top.pythagodzilla.courser.data.dataStore.DataStoreManager
-import top.pythagodzilla.courser.network.response.BaseCheckLoginResponse
+import top.pythagodzilla.courser.network.response.BaseCheckResponse
 import top.pythagodzilla.courser.network.response.GetSessionResponse
 import top.pythagodzilla.courser.network.response.TasksApiResponseClass
 
@@ -13,7 +13,6 @@ interface NetworkManager {
 
     // 登录相关接口
     suspend fun commonLogin(
-        deviceUuid: String = "923cc477a1c01902",
         appVersion: String = "8.7.1",
         password: String,
         devicePlatform: String = "android",
@@ -23,7 +22,6 @@ interface NetworkManager {
     ): Result<String>
 
     suspend fun getSessionId(
-        deviceUuid: String = "923cc477a1c01902",
         appVersion: String = "8.7.1",
         password: String,
         devicePlatform: String = "android",
@@ -40,7 +38,7 @@ interface NetworkManager {
         deviceVersion: String,
         username: String,
         deviceName: String
-    ): Result<BaseCheckLoginResponse>
+    ): Result<BaseCheckResponse>
 
 
     suspend fun isSessionValid(sessionId: String): Boolean

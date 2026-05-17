@@ -19,7 +19,6 @@ class OkHttpManager(
     private val getInfoModule = GetInfoModule(client)
 
     override suspend fun commonLogin(
-        deviceUuid: String,
         appVersion: String,
         password: String,
         devicePlatform: String,
@@ -27,7 +26,6 @@ class OkHttpManager(
         username: String,
         deviceName: String
     ) = loginModule.commonLogin(
-        deviceUuid,
         appVersion,
         password,
         devicePlatform,
@@ -37,7 +35,6 @@ class OkHttpManager(
     )
 
     override suspend fun getSessionId(
-        deviceUuid: String,
         appVersion: String,
         password: String,
         devicePlatform: String,
@@ -45,7 +42,6 @@ class OkHttpManager(
         username: String,
         deviceName: String
     ) = loginModule.getSessionId(
-        deviceUuid,
         appVersion,
         password,
         devicePlatform,
@@ -63,7 +59,6 @@ class OkHttpManager(
         username: String,
         deviceName: String
     ) = loginModule.loginCheck(
-        deviceUuid,
         appVersion,
         password,
         devicePlatform,
@@ -77,7 +72,6 @@ class OkHttpManager(
         getInfoModule.getUndoTasks()
 
     override suspend fun getUndoTasksString(): Result<String> = getInfoModule.getUndoTasksString()
-
 
     override suspend fun isSessionValid(sessionId: String): Boolean = loginModule.isSessionValid()
 }

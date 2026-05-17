@@ -1,6 +1,7 @@
 package top.pythagodzilla.courser.network
 
 import android.util.Log
+import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import top.pythagodzilla.courser.network.exception.ClientException
@@ -107,4 +108,41 @@ class GetInfoModule(private val client: OkHttpClient = OkHttpClient()) {
             return Result.failure(ClientException("Failed to get undo tasks: ${e.message}"))
         }
     }
+
+    /**
+     * enterCourse接口，用来通知服务器进行状态管理。
+     */
+//    suspend fun enterCourse(courseId: String): Result<String> {
+//        val body = FormBody.Builder()
+//            .add("courseId", courseId)
+//            .build()
+//
+//        val request = Request.Builder()
+//            .url("http://course.buct.edu.cn/mobile/enterCourse.do")
+//            .post(body)
+//            .build()
+//
+//        try {
+//            client.newCall(request).execute().use { response ->
+//                if (response.isSuccessful) {
+//                    val content = checkResponseNotLogin(response.body.string())
+//                    content
+//                        .onSuccess { rawContent ->
+//
+//                        }
+//                        .onFailure {
+//                            return Result.failure(
+//                                SessionExpiredException(
+//                                    response.code,
+//                                    it.message ?: "Session expired",
+//                                    response.code
+//                                )
+//                            )
+//                        }
+//                }
+//            }
+//        } catch (e: Exception) {
+//            return Result.failure(HttpException(-1, "Failed to enter course: ${e.message}"))
+//        }
+//    }
 }

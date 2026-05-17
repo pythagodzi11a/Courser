@@ -13,7 +13,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 @Serializable(with = BaseCheckLoginResponseSerializer::class)
-sealed class BaseCheckLoginResponse {
+sealed class BaseCheckResponse {
     abstract val status: Int
     abstract val sessionid: String
 }
@@ -23,14 +23,14 @@ data class SuccessCheckLoginResponse(
     val datas: SuccessCheckLoginDatas,
     override val status: Int,
     override val sessionid: String,
-) : BaseCheckLoginResponse()
+) : BaseCheckResponse()
 
 @Serializable
 data class FailureCheckLoginResponse(
     val datas: FailureCheckLoginDatas,
     override val status: Int,
     override val sessionid: String
-) : BaseCheckLoginResponse()
+) : BaseCheckResponse()
 
 @Serializable
 data class SuccessCheckLoginDatas(
@@ -63,17 +63,17 @@ data class User(
     val realname: String,
 )
 
-object BaseCheckLoginResponseSerializer : KSerializer<BaseCheckLoginResponse> {
+object BaseCheckLoginResponseSerializer : KSerializer<BaseCheckResponse> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(
         "BaseCheckLoginResponse",
         PrimitiveKind.STRING
     )
 
-    override fun serialize(encoder: Encoder, value: BaseCheckLoginResponse) {
+    override fun serialize(encoder: Encoder, value: BaseCheckResponse) {
         throw NotImplementedError("Serialization not implemented for BaseCheckLoginResponse")
     }
 
-    override fun deserialize(decoder: Decoder): BaseCheckLoginResponse {
+    override fun deserialize(decoder: Decoder): BaseCheckResponse {
         val input = decoder as JsonDecoder
         val jsonObj = input.decodeJsonElement().jsonObject
 

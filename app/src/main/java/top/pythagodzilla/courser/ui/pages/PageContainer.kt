@@ -12,10 +12,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.navigation.NavController
 
 @Composable
-fun PageContainer() {
-    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
+fun PageContainer(navController: NavController) {
+    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.TASKS) }
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
@@ -32,8 +33,8 @@ fun PageContainer() {
         }
     ) {
         when (currentDestination) {
-            AppDestinations.HOME -> TasksScreen()
-            AppDestinations.PROFILE -> ProfileScreen()
+            AppDestinations.TASKS -> TasksScreen()
+            AppDestinations.PROFILE -> ProfileScreen(navController = navController)
         }
     }
 }
@@ -43,6 +44,6 @@ enum class AppDestinations(
     val icon: ImageVector,
     val contentDescription: String
 ) {
-    HOME("任务", Icons.Default.Task, "任务"),
+    TASKS("任务", Icons.Default.Task, "任务"),
     PROFILE("个人", Icons.Default.AccountCircle, "个人")
 }

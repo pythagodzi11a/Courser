@@ -18,7 +18,7 @@ android {
         minSdk = 35
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "0.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -47,8 +47,11 @@ dependencies {
 
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
-    ksp("androidx.room:room-compiler:$room_version")
+    implementation("io.coil-kt.coil3:coil-compose:3.4.0")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.4.0")
 
+    ksp("androidx.room:room-compiler:$room_version")
+    implementation("br.com.devsrsouza.compose.icons:font-awesome:1.1.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.2")
     implementation("androidx.compose.material:material-icons-core:1.7.8")

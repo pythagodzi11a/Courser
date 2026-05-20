@@ -20,10 +20,14 @@ class ProfileScreenViewModel(application: Application) :
     private val _loginTimes = MutableStateFlow<Int?>(null)
     val loginTimes: StateFlow<Int?> = _loginTimes
 
+    private val _realName = MutableStateFlow<String?>(null)
+    val realName: StateFlow<String?> = _realName
+
     init {
         viewModelScope.launch {
             _avatarUrl.value = dataStore.readPhotoField()
             _loginTimes.value = dataStore.readLoginTimes()
+            _realName.value = dataStore.readRealName()
         }
     }
 

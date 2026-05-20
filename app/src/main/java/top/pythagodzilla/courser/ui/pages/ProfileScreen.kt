@@ -25,8 +25,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,6 +55,8 @@ fun ProfileScreen(
     navController: NavController
 ) {
     val photoField by profileScreenViewModel.avatarUrl.collectAsStateWithLifecycle()
+    val realName by profileScreenViewModel.realName.collectAsState()
+    val loginTimes by profileScreenViewModel.loginTimes.collectAsState()
 
     val settingsList = listOf(
         SettingUITypes.Toggle(
@@ -107,24 +111,53 @@ fun ProfileScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+            ) {
+                Text(
+                    text = "你好，${realName}",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(8.dp),
+                )
 
-            ListItem(
+                Spacer(modifier = Modifier.weight(1f))
+
+                Text(
+                    text = "登录次数：${loginTimes}",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(8.dp),
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
-                headlineContent = {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = "参与开发&反馈",
-                        style = MaterialTheme.typography.bodyLarge,
+                shape = RoundedCornerShape(8.dp),
+            ) {
+                Column() {
+                    ListItem(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        headlineContent = {
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = "参与开发&反馈",
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        },
+                        trailingContent = { ConnectionRow(context) }
                     )
-                },
-                trailingContent = { ConnectionRow(context) }
-            )
+                }
 
-//            ConnectionRow(context)
+            }
 
             Button(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
                 onClick = {
                     profileScreenViewModel.logout {
                         navController.navigate("login") {

@@ -1,8 +1,10 @@
 # Courser
 一个用于更方便BUCTer查看作业（目前）的App。
 
-<img src="assets/screenshots/TasksScreenShot.jpg" width=50%/>
+<img src="assets/screenshots/TasksScreenShot.jpg" height=300/>
 
+## 加入反馈&开发
+[Q群](https://qm.qq.com/q/er5fUjW1Ik)
 
 ## 一些问题
 ### Q：我把账号密码输入给app了会不会造成泄露

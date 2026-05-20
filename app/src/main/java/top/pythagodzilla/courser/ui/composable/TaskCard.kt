@@ -1,5 +1,7 @@
 package top.pythagodzilla.courser.ui.composable
 
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
@@ -23,9 +25,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import top.pythagodzilla.courser.network.response.HomeworkViewResponse
@@ -117,19 +121,38 @@ fun TaskCard(task: TasksType, tasksScreenViewModel: TasksScreenViewModel) {
             }
         }
 
-        ExpendCard(expend, taskDetail)
+        ExpendCard(expend, taskDetail?.datas?.taskContent)
     }
 }
 
 @Composable
 private fun ExpendCard(
     expend: Boolean,
-    taskDetail: HomeworkViewResponse?
+    taskDetail: String?
 ) {
+    val density = LocalDensity.current
+    var webViewHeight by remember { mutableStateOf(100f) }
+
     AnimatedVisibility(visible = expend) {
         Column(modifier = Modifier.padding(12.dp)) {
-//                Text(text = "开始时间：" + task.startTime)
-            Text(text = taskDetail?.datas?.taskContent ?: "暂无详情")
+            AndroidView(
+                factory = { context ->
+                    WebView(context).apply {
+                        settings.javaScriptEnabled = false
+                        setBackgroundColor(android.graphics.Color.TRANSPARENT)
+                        webViewClient = WebViewClient()
+                        loadDataWithBaseURL(
+                            null,
+                            taskDetail ?: "暂无详情",
+                            "text/html",
+                            "UTF-8",
+                            null
+                        )
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+            )
         }
     }
 }

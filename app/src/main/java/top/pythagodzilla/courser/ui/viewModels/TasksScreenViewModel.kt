@@ -8,6 +8,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import top.pythagodzilla.courser.CourserApplication
 import top.pythagodzilla.courser.data.dataBase.TaskDetailEntity
@@ -31,6 +33,8 @@ class TasksScreenViewModel(application: Application) : AndroidViewModel(applicat
 
     private val _tasksUIList = MutableStateFlow<List<TasksType>>(emptyList())
     val tasksUIList: StateFlow<List<TasksType>> = _tasksUIList
+
+    private val detailMutex = Mutex()
 
     init {
         viewModelScope.launch {
@@ -137,47 +141,56 @@ class TasksScreenViewModel(application: Application) : AndroidViewModel(applicat
     }
 
     suspend fun getTasksDetails(courseId: String, hwtid: String): HomeworkViewResponse? {
-
+        Log.d(
+            "TasksScreenViewModel",
+            "Fetching task details for courseId: $courseId, hwtid: $hwtid"
+        )
         val cached = taskDetailDao.getTaskDetailByTaskId(hwtid, courseId)
         if (cached != null) {
+            Log.d(
+                "TasksScreenViewModel",
+                "Found cached task detail for hwtid: $hwtid, courseId: $courseId, cached : ${cached.taskDetail}"
+            )
             return json.decodeFromString<HomeworkViewResponse>(cached.taskDetail)
         }
 
-        val enterCourseResponse = withContext(Dispatchers.IO) {
-            client.enterCourse(courseId)
-        }
-
-        val homeworkViewResponse = withContext(Dispatchers.IO) {
-            client.getHomeworkView(hwtid, courseId)
-        }
-
-        homeworkViewResponse.onSuccess { response ->
-            val parsedResponse = parsedTaskDetailResponse(response)
-
-            if (parsedResponse == null) {
-                Log.e("TasksScreenViewModel", "Failed to parse homework view response")
-                return@onSuccess
+        detailMutex.withLock{
+            val enterCourseResponse = withContext(Dispatchers.IO) {
+                client.enterCourse(courseId)
             }
 
-            Log.d(
-                "TasksScreenViewModel",
-                "Homework view response: ${parsedResponse.datas.taskContent}"
-            )
-            taskDetailDao.insertTaskDetail(
-                TaskDetailEntity(
-                    taskId = hwtid,
-                    courseId = courseId,
-                    taskDetail = response
-                )
-            )
-            return parsedResponse
-        }
-            .onFailure { exception ->
-                Log.e(
+            val homeworkViewResponse = withContext(Dispatchers.IO) {
+                client.getHomeworkView(hwtid, courseId)
+            }
+
+            homeworkViewResponse.onSuccess { response ->
+                val parsedResponse = parsedTaskDetailResponse(response)
+
+                if (parsedResponse == null) {
+                    Log.e("TasksScreenViewModel", "Failed to parse homework view response")
+                    return@onSuccess
+                }
+
+                Log.d(
                     "TasksScreenViewModel",
-                    "Failed to get homework view: ${exception.message}"
+                    "Homework view response: ${parsedResponse.datas.taskContent}"
                 )
+                taskDetailDao.insertTaskDetail(
+                    TaskDetailEntity(
+                        taskId = hwtid,
+                        courseId = courseId,
+                        taskDetail = response
+                    )
+                )
+                return parsedResponse
             }
+                .onFailure { exception ->
+                    Log.e(
+                        "TasksScreenViewModel",
+                        "Failed to get homework view: ${exception.message}"
+                    )
+                }
+        }
         return null
     }
 

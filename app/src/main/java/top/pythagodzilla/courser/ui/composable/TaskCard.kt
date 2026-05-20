@@ -4,6 +4,9 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,7 +16,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -25,7 +32,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,7 +49,8 @@ fun TaskCard(task: TasksType, tasksScreenViewModel: TasksScreenViewModel) {
     var expend by remember { mutableStateOf(false) }
     var taskDetail by remember { mutableStateOf<HomeworkViewResponse?>(null) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(task.courseId, task.id) {
+        taskDetail = null
         if (task is HomeworkClass) {
             taskDetail = withContext(Dispatchers.IO) {
                 tasksScreenViewModel.getTasksDetails(task.courseId, task.id)
@@ -84,7 +91,7 @@ fun TaskCard(task: TasksType, tasksScreenViewModel: TasksScreenViewModel) {
                 Text(
                     text = when (task) {
                         is HomeworkClass -> "作业"
-                        is ExamClass -> "考试"
+                        is ExamClass -> "测试"
                     },
                     color = when (task) {
                         is HomeworkClass -> MaterialTheme.colorScheme.onPrimary
@@ -121,38 +128,60 @@ fun TaskCard(task: TasksType, tasksScreenViewModel: TasksScreenViewModel) {
             }
         }
 
-        ExpendCard(expend, taskDetail?.datas?.taskContent)
+        ExpendCard(expend, taskDetail?.datas?.taskContent) { expend = false }
     }
 }
 
 @Composable
 private fun ExpendCard(
     expend: Boolean,
-    taskDetail: String?
+    taskDetail: String?,
+    onClose: () -> Unit = {}
 ) {
-    val density = LocalDensity.current
-    var webViewHeight by remember { mutableStateOf(100f) }
-
-    AnimatedVisibility(visible = expend) {
-        Column(modifier = Modifier.padding(12.dp)) {
+    AnimatedVisibility(
+        visible = expend,
+        enter = expandVertically(),
+        exit = shrinkVertically()
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(12.dp)
+                .clickable(onClick = { onClose() })
+        ) {
+            Text(
+                text = "作业详情",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
             AndroidView(
                 factory = { context ->
                     WebView(context).apply {
                         settings.javaScriptEnabled = false
                         setBackgroundColor(android.graphics.Color.TRANSPARENT)
                         webViewClient = WebViewClient()
-                        loadDataWithBaseURL(
-                            null,
-                            taskDetail ?: "暂无详情",
-                            "text/html",
-                            "UTF-8",
-                            null
-                        )
                     }
+                },
+                update = { webView ->
+                    webView.loadDataWithBaseURL(
+                        null,
+                        taskDetail ?: "暂无详情",
+                        "text/html",
+                        "UTF-8",
+                        null
+                    )
                 },
                 modifier = Modifier
                     .fillMaxWidth()
             )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(onClick = { onClose() }) {
+                    Icon(imageVector = Icons.Default.ExpandLess, contentDescription = "收起")
+                }
+            }
         }
     }
 }

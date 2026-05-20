@@ -130,6 +130,7 @@ class GetInfoModule(private val client: OkHttpClient = OkHttpClient()) {
                     val content = checkResponseNotLogin(response.body.string())
                     content
                         .onSuccess {
+                            Log.d("GetInfoModule", "enterCourse successful for courseId: $it")
                             return Result.success(it)
                         }
                         .onFailure {

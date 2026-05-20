@@ -111,38 +111,90 @@ class GetInfoModule(private val client: OkHttpClient = OkHttpClient()) {
 
     /**
      * enterCourse接口，用来通知服务器进行状态管理。
+     * @param courseId String 课程ID
+     * @return Result<String>，成功时返回原始body以供反序列化，失败时返回异常
      */
-//    suspend fun enterCourse(courseId: String): Result<String> {
-//        val body = FormBody.Builder()
-//            .add("courseId", courseId)
-//            .build()
+    suspend fun enterCourse(courseId: String): Result<String> {
+        val body = FormBody.Builder()
+            .add("courseId", courseId)
+            .build()
+
+        val request = Request.Builder()
+            .url("http://course.buct.edu.cn/mobile/enterCourse.do")
+            .post(body)
+            .build()
+
+        try {
+            client.newCall(request).execute().use { response ->
+                if (response.isSuccessful) {
+                    val content = checkResponseNotLogin(response.body.string())
+                    content
+                        .onSuccess {
+                            return Result.success(it)
+                        }
+                        .onFailure {
+                            return Result.failure(
+                                SessionExpiredException(
+                                    response.code,
+                                    it.message ?: "Session expired",
+                                    response.code
+                                )
+                            )
+                        }
+                    return Result.failure(
+                        UnknownException(
+                            response.code,
+                            "Unexpected response format"
+                        )
+                    )
+                } else {
+                    return Result.failure(
+                        HttpException(
+                            response.code,
+                            "HTTP error: ${response.message}"
+                        )
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(
+                "GetInfoModule", "enterCourse exception: ${e.toString()}"
+            )
+            return Result.failure(HttpException(-1, "Failed to enter course: ${e.message}"))
+        }
+    }
+
+    suspend fun getHomeworkView(hwtid: String, context: String): Result<String> {
+        val body = FormBody.Builder()
+            .add("hwtid", hwtid)
+            .add("context", context)
+            .build()
+
+        val request = Request.Builder()
+            .url("http://course.buct.edu.cn/mobile/homeworkView.do")
+            .post(body)
+            .build()
+
+        try {
+            client.newCall(request).execute().use { response ->
+//                val content = checkResponseNotLogin(response.body.string())
 //
-//        val request = Request.Builder()
-//            .url("http://course.buct.edu.cn/mobile/enterCourse.do")
-//            .post(body)
-//            .build()
-//
-//        try {
-//            client.newCall(request).execute().use { response ->
-//                if (response.isSuccessful) {
-//                    val content = checkResponseNotLogin(response.body.string())
-//                    content
-//                        .onSuccess { rawContent ->
-//
-//                        }
-//                        .onFailure {
-//                            return Result.failure(
-//                                SessionExpiredException(
-//                                    response.code,
-//                                    it.message ?: "Session expired",
-//                                    response.code
-//                                )
-//                            )
-//                        }
-//                }
-//            }
-//        } catch (e: Exception) {
-//            return Result.failure(HttpException(-1, "Failed to enter course: ${e.message}"))
-//        }
-//    }
+//                content.onSuccess { return Result.success(it) }
+//                    .onFailure { }
+                val content = response.body.string()
+                Log.d("GetInfoModule", "getHomeworkView raw response: $content")
+                return Result.success(content)
+            }
+        } catch (e: Exception) {
+            Log.e(
+                "GetInfoModule", "getHomeworkView exception: ${e.toString()}"
+            )
+            return Result.failure(
+                HttpException(
+                    -1,
+                    "Failed to get homework view: ${e.message}"
+                )
+            )
+        }
+    }
 }

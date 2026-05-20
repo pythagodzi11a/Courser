@@ -2,6 +2,8 @@
   <dictionary name="project">
     <words>
       <w>Datas</w>
+      <w>hwtid</w>
+      <w>sessionid</w>
     </words>
   </dictionary>
 </component>

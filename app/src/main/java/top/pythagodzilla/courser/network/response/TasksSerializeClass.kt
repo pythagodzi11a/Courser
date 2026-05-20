@@ -40,10 +40,10 @@ object ReminderListSerializer : KSerializer<ReminderListClass> {
                     val itemObj = item.jsonObject
                     val parsed: TaskItem =
                         if ("expiredTime" in itemObj || "examType" in itemObj) {
-                            input.json.decodeFromJsonElement<ExamClass>(item)
+                            input.json.decodeFromJsonElement< ExamResponseClass>(item)
 
                         } else {
-                            input.json.decodeFromJsonElement<HomeworkClass>(item)
+                            input.json.decodeFromJsonElement<HomeworkResponseClass>(item)
                         }
                     reminderList += parsed
                 }
@@ -76,7 +76,7 @@ sealed class TaskItem {
 
 
 @Serializable
-data class HomeworkClass(
+data class HomeworkResponseClass(
 
     override val id: Int,
     override val title: String,
@@ -93,7 +93,7 @@ data class HomeworkClass(
     ) : TaskItem()
 
 @Serializable
-data class ExamClass(
+data class ExamResponseClass(
     override val id: Int,
     override val title: String,
     override val publishStatus: Boolean,

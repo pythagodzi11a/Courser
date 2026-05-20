@@ -74,4 +74,10 @@ class OkHttpManager(
     override suspend fun getUndoTasksString(): Result<String> = getInfoModule.getUndoTasksString()
 
     override suspend fun isSessionValid(sessionId: String): Boolean = loginModule.isSessionValid()
+
+    override suspend fun enterCourse(courseId: String): Result<String> =
+        getInfoModule.enterCourse(courseId)
+
+    override suspend fun getHomeworkView(hwtid: String, context: String): Result<String> =
+        getInfoModule.getHomeworkView(hwtid, context)
 }

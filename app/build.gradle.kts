@@ -45,6 +45,8 @@ android {
 dependencies {
     val room_version = "2.8.4"
 
+    implementation("org.jsoup:jsoup:1.17.2")
+
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
     implementation("io.coil-kt.coil3:coil-compose:3.4.0")

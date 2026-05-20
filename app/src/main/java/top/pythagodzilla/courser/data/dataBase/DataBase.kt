@@ -8,9 +8,14 @@ import androidx.room.TypeConverters
 
 
 @TypeConverters(Convertor::class)
-@Database(entities = [TasksEntities::class], version = 1, exportSchema = false)
+@Database(
+    entities = [TasksEntities::class, TaskDetailEntity::class],
+    version = 1,
+    exportSchema = false
+)
 abstract class TaskDataBase : RoomDatabase() {
     abstract fun TasksDao(): TasksDao
+    abstract fun TaskDetailDao(): TaskDetailDao
 
     companion object {
         @Volatile

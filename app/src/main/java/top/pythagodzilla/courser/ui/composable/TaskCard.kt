@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CornerSize
@@ -17,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,17 +24,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import top.pythagodzilla.courser.ui.types.ExamUIClass
-import top.pythagodzilla.courser.ui.types.HomeworkUIClass
-import top.pythagodzilla.courser.ui.types.TaskUITypes
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import top.pythagodzilla.courser.network.response.HomeworkViewResponse
+import top.pythagodzilla.courser.ui.types.ExamClass
+import top.pythagodzilla.courser.ui.types.HomeworkClass
+import top.pythagodzilla.courser.ui.types.TasksType
+import top.pythagodzilla.courser.ui.viewModels.TasksScreenViewModel
 
 @Composable
-fun TaskCard(task: TaskUITypes) {
-
+fun TaskCard(task: TasksType, tasksScreenViewModel: TasksScreenViewModel) {
     var expend by remember { mutableStateOf(false) }
+    var taskDetail by remember { mutableStateOf<HomeworkViewResponse?>(null) }
+
+    LaunchedEffect(Unit) {
+        if (task is HomeworkClass) {
+            taskDetail = withContext(Dispatchers.IO) {
+                tasksScreenViewModel.getTasksDetails(task.courseId, task.id)
+            }
+        }
+    }
 
     Card(
         modifier = Modifier
@@ -62,18 +73,18 @@ fun TaskCard(task: TaskUITypes) {
             Surface(
                 shape = RoundedCornerShape(corner = CornerSize(50)),
                 color = when (task) {
-                    is HomeworkUIClass -> MaterialTheme.colorScheme.primary
-                    is ExamUIClass -> MaterialTheme.colorScheme.tertiary
+                    is HomeworkClass -> MaterialTheme.colorScheme.primary
+                    is ExamClass -> MaterialTheme.colorScheme.tertiary
                 }
             ) {
                 Text(
                     text = when (task) {
-                        is HomeworkUIClass -> "作业"
-                        is ExamUIClass -> "考试"
+                        is HomeworkClass -> "作业"
+                        is ExamClass -> "考试"
                     },
-                    color = when(task){
-                        is HomeworkUIClass -> MaterialTheme.colorScheme.onPrimary
-                        is ExamUIClass -> MaterialTheme.colorScheme.onTertiary
+                    color = when (task) {
+                        is HomeworkClass -> MaterialTheme.colorScheme.onPrimary
+                        is ExamClass -> MaterialTheme.colorScheme.onTertiary
                     },
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                     style = MaterialTheme.typography.labelMedium
@@ -87,10 +98,9 @@ fun TaskCard(task: TaskUITypes) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
-
         ) {
             Text(
-                text = task.title,
+                text = task.taskTitle,
                 style = MaterialTheme.typography.bodyLarge,
                 fontSize = 24.sp,
                 maxLines = 1,
@@ -107,40 +117,19 @@ fun TaskCard(task: TaskUITypes) {
             }
         }
 
-        AnimatedVisibility(visible = expend) {
-            Column(modifier = Modifier.padding(12.dp)) {
-                Text(text = "开始时间：" + task.startTime)
-            }
-        }
+        ExpendCard(expend, taskDetail)
     }
 }
 
-
-@Preview(
-    widthDp = 411,
-    showBackground = true,
-    backgroundColor = 0xFFFFEEEE
-)
 @Composable
-fun TaskCardPreview() {
-    Column() {
-        TaskCard(
-            HomeworkUIClass(
-
-                title = "Task Title",
-                startTime = "2024-06-01T08:00:00",
-                endTime = "2024-06-07T23:59:59",
-                courseName = "Course Name"
-            )
-        )
-        Spacer(modifier = Modifier.padding(4.dp))
-        TaskCard(
-            ExamUIClass(
-                title = "Exam Title",
-                startTime = "2024-06-01T08:00:00",
-                endTime = "2024-06-07T23:59:59",
-                courseName = "Course Name"
-            )
-        )
+private fun ExpendCard(
+    expend: Boolean,
+    taskDetail: HomeworkViewResponse?
+) {
+    AnimatedVisibility(visible = expend) {
+        Column(modifier = Modifier.padding(12.dp)) {
+//                Text(text = "开始时间：" + task.startTime)
+            Text(text = taskDetail?.datas?.taskContent ?: "暂无详情")
+        }
     }
 }

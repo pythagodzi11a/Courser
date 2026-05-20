@@ -47,6 +47,9 @@ interface NetworkManager {
 
     suspend fun getUndoTasksString(): Result<String>
     suspend fun getUndoTasks(): Result<TasksApiResponseClass>
+    suspend fun getHomeworkView(hwtid: String, context: String): Result<String>
+    suspend fun enterCourse(courseId: String): Result<String>
+
 }
 
 class SessionCookieInterceptor(

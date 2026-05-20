@@ -10,28 +10,31 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import top.pythagodzilla.courser.CourserApplication
+import top.pythagodzilla.courser.data.dataBase.TaskDetailEntity
 import top.pythagodzilla.courser.data.dataBase.TasksEntities
 import top.pythagodzilla.courser.network.exception.SessionExpiredException
 import top.pythagodzilla.courser.network.json
-import top.pythagodzilla.courser.network.response.ExamClass
-import top.pythagodzilla.courser.network.response.HomeworkClass
+import top.pythagodzilla.courser.network.response.ExamResponseClass
+import top.pythagodzilla.courser.network.response.HomeworkResponseClass
+import top.pythagodzilla.courser.network.response.HomeworkViewResponse
 import top.pythagodzilla.courser.network.response.TasksApiResponseClass
-import top.pythagodzilla.courser.ui.types.ExamUIClass
-import top.pythagodzilla.courser.ui.types.HomeworkUIClass
-import top.pythagodzilla.courser.ui.types.TaskUITypes
+import top.pythagodzilla.courser.ui.types.ExamClass
+import top.pythagodzilla.courser.ui.types.HomeworkClass
+import top.pythagodzilla.courser.ui.types.TasksType
 import java.time.format.DateTimeFormatter
 
 class TasksScreenViewModel(application: Application) : AndroidViewModel(application) {
     val client = (application as CourserApplication).client
     val dataStore = (application as CourserApplication).dataStore
-    val dao = (application as CourserApplication).database.TasksDao()
+    val tasksDao = (application as CourserApplication).database.TasksDao()
+    val taskDetailDao = (application as CourserApplication).database.TaskDetailDao()
 
-    private val _tasksUIList = MutableStateFlow<List<TaskUITypes>>(emptyList())
-    val tasksUIList: StateFlow<List<TaskUITypes>> = _tasksUIList
+    private val _tasksUIList = MutableStateFlow<List<TasksType>>(emptyList())
+    val tasksUIList: StateFlow<List<TasksType>> = _tasksUIList
 
     init {
         viewModelScope.launch {
-            dao.getAllTasks().collect { entity ->
+            tasksDao.getAllTasks().collect { entity ->
                 _tasksUIList.value = if (entity != null) {
                     parsedTasks(entity.tasksList)
                 } else emptyList()
@@ -39,6 +42,8 @@ class TasksScreenViewModel(application: Application) : AndroidViewModel(applicat
         }
 
         fetchAndSaveTasks()
+
+//        getTasksDetails("39252", "75622")
     }
 
     private fun fetchAndSaveTasks() {
@@ -49,7 +54,7 @@ class TasksScreenViewModel(application: Application) : AndroidViewModel(applicat
                 }
 
                 response.onSuccess {
-                    dao.insertTasks(TasksEntities(tasksList = it))
+                    tasksDao.insertTasks(TasksEntities(tasksList = it))
                 }
                     .onFailure { exception ->
                         when (exception) {
@@ -75,18 +80,20 @@ class TasksScreenViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
-    private fun parsedTasks(rawJson: String): List<TaskUITypes> {
+    private fun parsedTasks(rawJson: String): List<TasksType> {
         val tasks = json.decodeFromString<TasksApiResponseClass>(rawJson)
-        val list = mutableListOf<TaskUITypes>()
+        val list = mutableListOf<TasksType>()
 
 
         tasks.datas.forEach { items ->
             items.reminderList.forEach { task ->
                 when (task) {
-                    is HomeworkClass -> {
+                    is HomeworkResponseClass -> {
                         list.add(
-                            HomeworkUIClass(
-                                title = task.title,
+                            HomeworkClass(
+                                id = task.id.toString(),
+                                courseId = items.courseId.toString(),
+                                taskTitle = task.title,
                                 courseName = items.courseName,
                                 startTime = task.startTime.format(
                                     DateTimeFormatter.ofPattern(
@@ -102,10 +109,12 @@ class TasksScreenViewModel(application: Application) : AndroidViewModel(applicat
                         )
                     }
 
-                    is ExamClass -> {
+                    is ExamResponseClass -> {
                         list.add(
-                            ExamUIClass(
-                                title = task.title,
+                            ExamClass(
+                                id = task.id.toString(),
+                                courseId = items.courseId.toString(),
+                                taskTitle = task.title,
                                 courseName = items.courseName,
                                 startTime = task.startTime.format(
                                     DateTimeFormatter.ofPattern(
@@ -126,4 +135,59 @@ class TasksScreenViewModel(application: Application) : AndroidViewModel(applicat
 
         return list
     }
+
+    suspend fun getTasksDetails(courseId: String, hwtid: String): HomeworkViewResponse? {
+
+        val cached = taskDetailDao.getTaskDetailByTaskId(hwtid, courseId)
+        if (cached != null) {
+            return json.decodeFromString<HomeworkViewResponse>(cached.taskDetail)
+        }
+
+        val enterCourseResponse = withContext(Dispatchers.IO) {
+            client.enterCourse(courseId)
+        }
+
+        val homeworkViewResponse = withContext(Dispatchers.IO) {
+            client.getHomeworkView(hwtid, courseId)
+        }
+
+        homeworkViewResponse.onSuccess { response ->
+            val parsedResponse = parsedTaskDetailResponse(response)
+
+            if (parsedResponse == null) {
+                Log.e("TasksScreenViewModel", "Failed to parse homework view response")
+                return@onSuccess
+            }
+
+            Log.d(
+                "TasksScreenViewModel",
+                "Homework view response: ${parsedResponse.datas.taskContent}"
+            )
+            taskDetailDao.insertTaskDetail(
+                TaskDetailEntity(
+                    taskId = hwtid,
+                    courseId = courseId,
+                    taskDetail = response
+                )
+            )
+            return parsedResponse
+        }
+            .onFailure { exception ->
+                Log.e(
+                    "TasksScreenViewModel",
+                    "Failed to get homework view: ${exception.message}"
+                )
+            }
+        return null
+    }
+
+    fun parsedTaskDetailResponse(rawJson: String): HomeworkViewResponse? {
+        return try {
+            json.decodeFromString<HomeworkViewResponse>(rawJson)
+        } catch (e: Exception) {
+            Log.e("TasksScreenViewModel", "Failed to parse homework view response: ${e.message}")
+            null
+        }
+    }
+
 }

@@ -16,7 +16,7 @@ data class HomeworkViewDatasClass(
     val maySubmit: Boolean,
     val mayModify: Int,
     val hwTaskId: Int,
-    val back: String,
+    val back: Boolean,
     val taskContent: String,
     val taskTitle: String
 )

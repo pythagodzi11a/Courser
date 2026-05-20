@@ -10,9 +10,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,7 +23,6 @@ import top.pythagodzilla.courser.ui.viewModels.TasksScreenViewModel
 fun TasksScreen(
     tasksViewModel: TasksScreenViewModel = viewModel()
 ) {
-    var testByte by rememberSaveable { mutableStateOf("") }
     val tasksUIList by tasksViewModel.tasksUIList.collectAsStateWithLifecycle()
 
     Scaffold(
@@ -40,13 +36,14 @@ fun TasksScreen(
             )
         }
     ) { innerPadding ->
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            items(tasksUIList.size, key = { tasksUIList[it].title }) {
-                TaskCard(tasksUIList[it])
+            items(tasksUIList.size, key = { tasksUIList[it].taskTitle }) {
+                TaskCard(tasksUIList[it],tasksViewModel)
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }

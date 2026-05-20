@@ -7,6 +7,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,6 +37,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewFeature
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import top.pythagodzilla.courser.network.response.HomeworkViewResponse
@@ -138,6 +141,8 @@ private fun ExpendCard(
     taskDetail: String?,
     onClose: () -> Unit = {}
 ) {
+    val isDark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
+
     AnimatedVisibility(
         visible = expend,
         enter = expandVertically(),
@@ -162,13 +167,12 @@ private fun ExpendCard(
                     }
                 },
                 update = { webView ->
-                    webView.loadDataWithBaseURL(
-                        null,
-                        taskDetail ?: "暂无详情",
-                        "text/html",
-                        "UTF-8",
-                        null
-                    )
+                    val html = if (isDark) {
+                        """<!DOCTYPE html><html><head><meta name="color-scheme" content="dark"><style>*{color:#E0E0E0!important;background-color:transparent!important}a{color:#81D4FA!important}</style></head><body>${taskDetail ?: "暂无详情"}</body></html>"""
+                    } else {
+                        taskDetail ?: "暂无详情"
+                    }
+                    webView.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null)
                 },
                 modifier = Modifier
                     .fillMaxWidth()

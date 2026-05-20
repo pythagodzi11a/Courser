@@ -17,8 +17,8 @@ android {
         applicationId = "top.pythagodzilla.courser"
         minSdk = 35
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -43,6 +43,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.webkit)
     val room_version = "2.8.4"
 
     implementation("org.jsoup:jsoup:1.17.2")

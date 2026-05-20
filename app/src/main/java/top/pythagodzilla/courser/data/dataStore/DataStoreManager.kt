@@ -68,6 +68,9 @@ class DataStoreManager(private val context: Context) {
             it.remove(usernameKey)
             it.remove(passwordKey)
             it.remove(sessionKey)
+            it.remove(photoFieldKey)
+            it.remove(realNameKey)
+            it.remove(loginTimesKey)
         }
     }
 

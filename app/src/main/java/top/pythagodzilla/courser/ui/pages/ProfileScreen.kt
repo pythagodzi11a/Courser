@@ -18,6 +18,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AcUnit
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -120,24 +122,24 @@ fun ProfileScreen(
 
 //            ConnectionRow(context)
 
-//            Button(
-//                modifier = Modifier
-//                    .fillMaxWidth(),
-//                onClick = {
-//                    profileScreenViewModel.logout({
-//                        navController.navigate("login") {
-//                            popUpTo("page_container") { inclusive = true }
-//                        }
-//                    })
-//                },
-//                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error)
-//            ) {
-//                Text(
-//                    text = "退出登录",
-//                    color = MaterialTheme.colorScheme.onError,
-//                    style = MaterialTheme.typography.bodyLarge
-//                )
-//            }
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                onClick = {
+                    profileScreenViewModel.logout {
+                        navController.navigate("login") {
+                            popUpTo("pages") { inclusive = true }
+                        }
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error)
+            ) {
+                Text(
+                    text = "退出登录",
+                    color = MaterialTheme.colorScheme.onError,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
 
         }
     }

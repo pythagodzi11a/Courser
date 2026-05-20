@@ -32,6 +32,7 @@ class ProfileScreenViewModel(application: Application) :
             withContext(Dispatchers.IO) {
                 dataStore.clearLoginInfo()
             }
+            onDone()
         }
     }
 }

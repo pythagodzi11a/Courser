@@ -20,6 +20,7 @@ class LoginScreenViewModel(application: Application) : AndroidViewModel(applicat
     fun login(username: String, password: String) {
         viewModelScope.launch {
             buttonLoading.value = true
+            loginMessage.value = ""
 
             withContext(Dispatchers.IO) {
                 val result = client.commonLogin(

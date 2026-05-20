@@ -18,8 +18,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,13 +42,24 @@ import top.pythagodzilla.courser.ui.viewModels.LoginScreenViewModel
 fun LoginScreen(loginViewModel: LoginScreenViewModel = viewModel(), navController: NavController) {
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
-    var message by rememberSaveable { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
 
     val buttonLoading by loginViewModel.buttonLoading.collectAsState()
     val loginStatus by loginViewModel.loginStatus.collectAsState()
+    val loginMessage by loginViewModel.loginMessage.collectAsState()
 
-    Scaffold(modifier = Modifier.fillMaxSize()) { paddingValues ->
+    val snackHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(loginMessage) {
+        if (loginMessage.isNotEmpty()) {
+            snackHostState.showSnackbar(loginMessage)
+        }
+    }
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(snackHostState) }
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -131,7 +145,7 @@ fun LoginScreen(loginViewModel: LoginScreenViewModel = viewModel(), navControlle
                 else Text("登录")
             }
 
-            Text(message)
+//            Text(message)
 
         }
     }

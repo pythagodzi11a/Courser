@@ -4,7 +4,6 @@ import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,8 +18,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AcUnit
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -114,7 +111,7 @@ fun ProfileScreen(
                 headlineContent = {
                     Text(
                         modifier = Modifier.fillMaxWidth(),
-                        text = "参与开发",
+                        text = "参与开发&反馈",
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 },
@@ -123,24 +120,24 @@ fun ProfileScreen(
 
 //            ConnectionRow(context)
 
-            Button(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                onClick = {
-                    profileScreenViewModel.logout({
-                        navController.navigate("login") {
-                            popUpTo("page_container") { inclusive = true }
-                        }
-                    })
-                },
-                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error)
-            ) {
-                Text(
-                    text = "退出登录",
-                    color = MaterialTheme.colorScheme.onError,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
+//            Button(
+//                modifier = Modifier
+//                    .fillMaxWidth(),
+//                onClick = {
+//                    profileScreenViewModel.logout({
+//                        navController.navigate("login") {
+//                            popUpTo("page_container") { inclusive = true }
+//                        }
+//                    })
+//                },
+//                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error)
+//            ) {
+//                Text(
+//                    text = "退出登录",
+//                    color = MaterialTheme.colorScheme.onError,
+//                    style = MaterialTheme.typography.bodyLarge
+//                )
+//            }
 
         }
     }
@@ -154,7 +151,7 @@ private fun ConnectionRow(context: Context) {
                 context.startActivity(
                     Intent(
                         Intent.ACTION_VIEW,
-                        "https://git.pythagodzilla.top/pythagodzilla/Courser.git".toUri()
+                        "https://github.com/pythagodzi11a/Courser.git".toUri()
                     )
                 )
             }) {
@@ -169,7 +166,7 @@ private fun ConnectionRow(context: Context) {
         IconButton(onClick = {
             val clipboard =
                 context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-            clipboard.setPrimaryClip(ClipData.newPlainText("QQ", "123456789"))
+            clipboard.setPrimaryClip(ClipData.newPlainText("QQ", "1098721138"))
             Toast.makeText(context, "QQ号已复制到剪贴板", Toast.LENGTH_SHORT).show()
         }) {
             Icon(

@@ -3,6 +3,9 @@
 
 <img src="assets/screenshots/TasksScreenShot.jpg" height=300/>
 
+
+使用Jetpack Compose及kotlin构建。
+
 ## 加入反馈&开发
 [Q群](https://qm.qq.com/q/er5fUjW1Ik)
 

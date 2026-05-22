@@ -1,5 +1,6 @@
 package top.pythagodzilla.courser.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -18,8 +19,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,6 +30,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -40,25 +40,25 @@ import top.pythagodzilla.courser.ui.viewModels.LoginScreenViewModel
 
 @Composable
 fun LoginScreen(loginViewModel: LoginScreenViewModel = viewModel(), navController: NavController) {
+    val context = LocalContext.current
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var passwordVisibility by remember { mutableStateOf(false) }
+    val toast = remember { Toast.makeText(context, "", Toast.LENGTH_SHORT) }
 
     val buttonLoading by loginViewModel.buttonLoading.collectAsState()
     val loginStatus by loginViewModel.loginStatus.collectAsState()
     val loginMessage by loginViewModel.loginMessage.collectAsState()
 
-    val snackHostState = remember { SnackbarHostState() }
-
     LaunchedEffect(loginMessage) {
         if (loginMessage.isNotEmpty()) {
-            snackHostState.showSnackbar(loginMessage)
+            toast.setText(loginMessage)
+            toast.show()
         }
     }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        snackbarHost = { SnackbarHost(snackHostState) }
     ) { paddingValues ->
         Column(
             modifier = Modifier

@@ -1,11 +1,13 @@
 package top.pythagodzilla.courser.network
 
 import android.util.Log
+import androidx.compose.ui.text.font.Font
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import top.pythagodzilla.courser.data.dataStore.DataStoreManager
 import top.pythagodzilla.courser.network.exception.HttpException
+import top.pythagodzilla.courser.network.exception.LoginFailureException
 import top.pythagodzilla.courser.network.exception.SessionExpiredException
 import top.pythagodzilla.courser.network.exception.StringException
 import top.pythagodzilla.courser.network.exception.UnknownException
@@ -80,6 +82,7 @@ class LoginModule(
 
                     is FailureCheckLoginResponse -> {
                         Log.d("LoginModule", "$response")
+                        return Result.failure(LoginFailureException(response.datas.errorCode, response.datas.errorMessage))
                     }
                 }
             }

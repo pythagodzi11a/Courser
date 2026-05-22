@@ -6,6 +6,10 @@ data class HttpException(
     val body: String
 ) : Exception("HTTP $code: $body")
 
+data class LoginFailureException(
+    val code: String,
+    val exceptionMessage: String
+) : Exception("Login Failed $code: $exceptionMessage")
 
 data class SessionExpiredException(
     val code: Int,

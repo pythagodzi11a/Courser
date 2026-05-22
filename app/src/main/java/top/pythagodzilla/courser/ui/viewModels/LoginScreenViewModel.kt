@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import top.pythagodzilla.courser.CourserApplication
+import top.pythagodzilla.courser.network.exception.LoginFailureException
+import top.pythagodzilla.courser.network.exception.StringException
 
 class LoginScreenViewModel(application: Application) : AndroidViewModel(application) {
     val client = (application as CourserApplication).client
@@ -28,13 +30,26 @@ class LoginScreenViewModel(application: Application) : AndroidViewModel(applicat
                     password = password
                 )
 
-                result.onSuccess { result ->
-                    loginMessage.value = result
-                    loginStatus.value = true
-                    dataStore.addLoginInfo(username, password)
-                }
-                    .onFailure {
-                        loginMessage.value = it.message ?: it.toString()
+                result
+                    .onSuccess {
+                        loginStatus.value = true
+                        dataStore.addLoginInfo(username, password)
+                    }
+                    .onFailure { exception ->
+                        when (exception) {
+                            is LoginFailureException -> {
+                                loginMessage.value = exception.exceptionMessage
+                            }
+
+                            is StringException -> {
+                                loginMessage.value =
+                                    "登录失败." + "(${exception.exceptionMessage})"
+                            }
+
+                            else -> {
+                                loginMessage.value = "发生未知错误"
+                            }
+                        }
                     }
             }
 

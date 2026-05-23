@@ -26,8 +26,10 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -37,6 +39,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -46,6 +50,7 @@ import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Brands
 import compose.icons.fontawesomeicons.brands.Github
 import compose.icons.fontawesomeicons.brands.Qq
+import top.pythagodzilla.courser.R
 import top.pythagodzilla.courser.ui.types.SettingUITypes
 import top.pythagodzilla.courser.ui.viewModels.ProfileScreenViewModel
 
@@ -69,6 +74,16 @@ fun ProfileScreen(
     )
 
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        val builder = NotificationCompat.Builder(context, "task_reminder")
+            .setSmallIcon(R.drawable.ic_favorite)
+            .setContentTitle("设置")
+            .setContentText("这是一个设置的通知")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+
+            if (NotificationManagerCompat.from(context).areNotificationsEnabled()){ NotificationManagerCompat.from(context).notify(1, builder.build()) }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -138,6 +153,30 @@ fun ProfileScreen(
                 shape = RoundedCornerShape(8.dp),
             ) {
                 Column() {
+                    settingsList.forEach { item ->
+                        when (item) {
+                            is SettingUITypes.Toggle -> {
+                                ListItem(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    headlineContent = {
+                                        Text(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            text = item.title,
+                                            style = MaterialTheme.typography.bodyLarge,
+                                        )
+                                    },
+                                    trailingContent = {
+                                        Switch(
+                                            checked = item.checked,
+                                            onCheckedChange = item.onChecked
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    }
+
                     ListItem(
                         modifier = Modifier
                             .fillMaxWidth(),

@@ -7,7 +7,6 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,12 +32,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.webkit.WebSettingsCompat
-import androidx.webkit.WebViewFeature
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import top.pythagodzilla.courser.network.response.HomeworkViewResponse
@@ -168,9 +166,9 @@ private fun ExpendCard(
                 },
                 update = { webView ->
                     val html = if (isDark) {
-                        """<!DOCTYPE html><html><head><meta name="color-scheme" content="dark"><style>*{color:#E0E0E0!important;background-color:transparent!important}a{color:#81D4FA!important}</style></head><body>${taskDetail ?: "暂无详情"}</body></html>"""
+                        """<!DOCTYPE html><html><head><meta name="color-scheme" content="dark"><style>img{max-width:100%;height:auto}*{color:#E0E0E0!important;background-color:transparent!important}a{color:#81D4FA!important}</style></head><body>${taskDetail ?: "暂无详情"}</body></html>"""
                     } else {
-                        taskDetail ?: "暂无详情"
+                        """<!DOCTYPE html><html><head><meta name="color-scheme" content="light"><style>img{max-width:100%;height:auto}</style></head><body>${taskDetail ?: "暂无详情"}</body></html>"""
                     }
                     webView.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null)
                 },

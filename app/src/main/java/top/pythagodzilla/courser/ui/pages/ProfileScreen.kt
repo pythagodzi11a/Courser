@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.AcUnit
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -54,6 +55,7 @@ import top.pythagodzilla.courser.R
 import top.pythagodzilla.courser.ui.types.SettingUITypes
 import top.pythagodzilla.courser.ui.viewModels.ProfileScreenViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     profileScreenViewModel: ProfileScreenViewModel = viewModel(),
@@ -82,7 +84,9 @@ fun ProfileScreen(
             .setContentText("这是一个设置的通知")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
-            if (NotificationManagerCompat.from(context).areNotificationsEnabled()){ NotificationManagerCompat.from(context).notify(1, builder.build()) }
+        if (NotificationManagerCompat.from(context).areNotificationsEnabled()) {
+            NotificationManagerCompat.from(context).notify(1, builder.build())
+        }
     }
 
     Scaffold(
@@ -94,6 +98,7 @@ fun ProfileScreen(
                 fontSize = 30.sp,
                 modifier = Modifier.padding(16.dp)
             )
+
         }) { paddingValues ->
         Column(
             modifier = Modifier

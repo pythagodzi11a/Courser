@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -26,6 +27,12 @@ import top.pythagodzilla.courser.ui.types.TasksType
 import java.time.format.DateTimeFormatter
 
 class TasksScreenViewModel(application: Application) : AndroidViewModel(application) {
+    enum class SortMode {
+        BY_START_TIME,
+        BY_END_TIME,
+        BY_COURSE_NAME,
+    }
+
     val client = (application as CourserApplication).client
     val dataStore = (application as CourserApplication).dataStore
     val tasksDao = (application as CourserApplication).database.TasksDao()
@@ -36,18 +43,21 @@ class TasksScreenViewModel(application: Application) : AndroidViewModel(applicat
 
     private val detailMutex = Mutex()
 
+    private val _sortMode = MutableStateFlow(SortMode.BY_END_TIME)
+    val sortMode: StateFlow<SortMode> = _sortMode
+
     init {
         viewModelScope.launch {
-            tasksDao.getAllTasks().collect { entity ->
-                _tasksUIList.value = if (entity != null) {
-                    parsedTasks(entity.tasksList)
-                } else emptyList()
-            }
+            combine(tasksDao.getAllTasks(), _sortMode) { entity, mode ->
+                val list = if (entity != null) parsedTasks(entity.tasksList) else emptyList()
+                when (mode) {
+                    SortMode.BY_END_TIME -> list.sortedBy { it.endTime }
+                    SortMode.BY_COURSE_NAME -> list.sortedBy { it.courseName }
+                    SortMode.BY_START_TIME -> list.sortedBy { it.startTime }
+                }
+            }.collect { _tasksUIList.value = it }
         }
-
         fetchAndSaveTasks()
-
-//        getTasksDetails("39252", "75622")
     }
 
     private fun fetchAndSaveTasks() {
@@ -154,7 +164,7 @@ class TasksScreenViewModel(application: Application) : AndroidViewModel(applicat
             return json.decodeFromString<HomeworkViewResponse>(cached.taskDetail)
         }
 
-        detailMutex.withLock{
+        detailMutex.withLock {
             val enterCourseResponse = withContext(Dispatchers.IO) {
                 client.enterCourse(courseId)
             }
@@ -201,6 +211,10 @@ class TasksScreenViewModel(application: Application) : AndroidViewModel(applicat
             Log.e("TasksScreenViewModel", "Failed to parse homework view response: ${e.message}")
             null
         }
+    }
+
+    fun setSortMode(mode: SortMode) {
+        _sortMode.value = mode
     }
 
 }

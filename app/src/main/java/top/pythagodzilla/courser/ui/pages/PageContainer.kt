@@ -1,5 +1,6 @@
 package top.pythagodzilla.courser.ui.pages
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Task
@@ -32,9 +33,11 @@ fun PageContainer(navController: NavController) {
             }
         }
     ) {
-        when (currentDestination) {
-            AppDestinations.TASKS -> TasksScreen()
-            AppDestinations.PROFILE -> ProfileScreen(navController = navController)
+        Crossfade(targetState = currentDestination) { destination ->
+            when (destination) {
+                AppDestinations.TASKS -> TasksScreen()
+                AppDestinations.PROFILE -> ProfileScreen(navController = navController)
+            }
         }
     }
 }

@@ -199,7 +199,7 @@ suspend fun checkSoftwareUpdate(dataStore: DataStoreManager): UpdateInfo? {
                 val tagName = jsonObj.getString("tag_name")
 
                 val currentVersion = dataStore.readNewestVersion()
-
+                Log.d("UpdateCheck", "Current version: $currentVersion, Latest version: $tagName")
 
                 when (currentVersion) {
                     null -> {

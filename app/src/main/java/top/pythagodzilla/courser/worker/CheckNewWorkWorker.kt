@@ -56,12 +56,29 @@ class CheckNewWorkWorker(appContext: Context, workerParams: WorkerParameters) :
         Log.d("CourserWorker", "Worker triggered, retryCount: $retryCount")
 
         freshData.onSuccess { responseString ->
-            if (oldData != null) {
-                val responseObj = json.decodeFromString<TasksApiResponseClass>(responseString)
-                val formerResponse = json.decodeFromString<TasksApiResponseClass>(oldData.tasksList)
+            val newResponse = json.decodeFromString<TasksApiResponseClass>(responseString)
 
-                if (responseObj.datas != formerResponse.datas) {
-                    sendNotification(applicationContext)
+            if (oldData != null) {
+                val oldResponse = json.decodeFromString<TasksApiResponseClass>(oldData.tasksList)
+
+                val oldIds = oldResponse.datas
+                    .flatMap { it.reminderList.map { task -> task.id } }
+                    .toSet()
+                val newIds = newResponse.datas
+                    .flatMap { it.reminderList.map { task -> task.id } }
+                    .toSet()
+                val addedIds = newIds - oldIds
+
+                if (addedIds.isNotEmpty()) {
+                    val addedTasks = mutableListOf<Pair<String, String>>()
+                    newResponse.datas.forEach { course ->
+                        course.reminderList.forEach { task ->
+                            if (task.id in addedIds) {
+                                addedTasks += course.courseName to task.title
+                            }
+                        }
+                    }
+                    sendNotification(applicationContext, addedTasks)
                 }
             }
             taskDao.insertTasks(TasksEntities(tasksList = responseString))
@@ -101,11 +118,14 @@ class CheckNewWorkWorker(appContext: Context, workerParams: WorkerParameters) :
     }
 
 
-    private fun sendNotification(context: Context) {
+    private fun sendNotification(context: Context,tasks: List<Pair<String, String>>) {
+        val title = if (tasks.size == 1) "新任务" else "有${tasks.size}个新任务"
+        val body = tasks.joinToString("\n") { (course,title) -> "《$course》 $title" }
+
         val builder = NotificationCompat.Builder(context, "task_reminder")
-            .setSmallIcon(R.drawable.ic_account_box)
-            .setContentTitle("新任务")
-            .setContentText("有新的任务")
+            .setSmallIcon(R.drawable.outline_notifications_24)
+            .setContentTitle(title)
+            .setContentText(body)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
         if (NotificationManagerCompat.from(context).areNotificationsEnabled()) {

@@ -3,6 +3,7 @@ package top.pythagodzilla.courser.ui
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -126,6 +127,22 @@ fun LoginScreen(loginViewModel: LoginScreenViewModel = viewModel(), navControlle
                 singleLine = true,
                 visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation()
             )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                Button(onClick = {
+                    navController.navigate("pages")
+                }) {
+                    Text(
+                        text = "跳过登录",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.scrim
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 

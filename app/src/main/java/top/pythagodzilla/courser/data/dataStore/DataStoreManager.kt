@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.map
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 class DataStoreManager(private val context: Context) {
+    private val newestVersionKey = stringPreferencesKey("newest_version")
     private val sessionKey = stringPreferencesKey("session_id")
     private val usernameKey = stringPreferencesKey("username")
     private val passwordKey = stringPreferencesKey("password")
@@ -111,5 +112,13 @@ class DataStoreManager(private val context: Context) {
 
     suspend fun readLoginTimes(): Int? {
         return context.dataStore.data.map { it[loginTimesKey] }.first()
+    }
+
+    suspend fun readNewestVersion(): String? {
+        return context.dataStore.data.map { it[newestVersionKey] }.first()
+    }
+
+    suspend fun saveNewestVersion(version: String) {
+        context.dataStore.edit { it[newestVersionKey] = version }
     }
 }

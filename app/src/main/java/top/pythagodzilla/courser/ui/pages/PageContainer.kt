@@ -48,5 +48,5 @@ enum class AppDestinations(
     val contentDescription: String
 ) {
     TASKS("任务", Icons.Default.Task, "任务"),
-    PROFILE("个人", Icons.Default.AccountCircle, "个人")
+    PROFILE("个人", Icons.Default.AccountCircle, "个人"),
 }

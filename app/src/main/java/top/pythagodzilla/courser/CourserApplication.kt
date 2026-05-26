@@ -66,7 +66,7 @@ class CourserApplication : Application() {
         WorkManager.getInstance(this)
             .enqueueUniquePeriodicWork(
                 "courser_check_tasks",
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.REPLACE, // 用KEEP会在测试状态无法加入WorkManger，有问题再改。
                 request
             )
     }

@@ -78,15 +78,7 @@ fun ProfileScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        val builder = NotificationCompat.Builder(context, "task_reminder")
-            .setSmallIcon(R.drawable.ic_favorite)
-            .setContentTitle("设置")
-            .setContentText("这是一个设置的通知")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
-        if (NotificationManagerCompat.from(context).areNotificationsEnabled()) {
-            NotificationManagerCompat.from(context).notify(1, builder.build())
-        }
     }
 
     Scaffold(

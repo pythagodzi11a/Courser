@@ -3,12 +3,19 @@ package top.pythagodzilla.courser
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import okhttp3.OkHttpClient
 import top.pythagodzilla.courser.data.dataBase.TaskDataBase
 import top.pythagodzilla.courser.data.dataStore.DataStoreManager
 import top.pythagodzilla.courser.network.NetworkManager
 import top.pythagodzilla.courser.network.OkHttpManager
 import top.pythagodzilla.courser.network.SessionCookieInterceptor
+import top.pythagodzilla.courser.worker.CheckNewWorkWorker
+import java.util.concurrent.TimeUnit
 
 class CourserApplication : Application() {
 
@@ -32,6 +39,7 @@ class CourserApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
+        scheduleCheckTasks()
     }
 
     private fun createNotificationChannel() {
@@ -44,5 +52,22 @@ class CourserApplication : Application() {
 
         val manager = getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(channel)
+    }
+
+    private fun scheduleCheckTasks() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val request = PeriodicWorkRequestBuilder<CheckNewWorkWorker>(1, TimeUnit.HOURS)
+            .setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance(this)
+            .enqueueUniquePeriodicWork(
+                "courser_check_tasks",
+                ExistingPeriodicWorkPolicy.KEEP,
+                request
+            )
     }
 }

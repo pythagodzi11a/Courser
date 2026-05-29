@@ -59,7 +59,7 @@ class CourserApplication : Application() {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val request = PeriodicWorkRequestBuilder<CheckNewWorkWorker>(1, TimeUnit.HOURS)
+        val request = PeriodicWorkRequestBuilder<CheckNewWorkWorker>(30, TimeUnit.MINUTES)
             .setConstraints(constraints)
             .build()
 

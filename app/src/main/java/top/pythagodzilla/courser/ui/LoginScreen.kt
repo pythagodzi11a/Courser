@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -133,7 +134,7 @@ fun LoginScreen(loginViewModel: LoginScreenViewModel = viewModel(), navControlle
                     .padding(24.dp),
                 horizontalArrangement = Arrangement.End
             ) {
-                Button(onClick = {
+                TextButton(onClick = {
                     navController.navigate("pages")
                 }) {
                     Text(
@@ -144,15 +145,11 @@ fun LoginScreen(loginViewModel: LoginScreenViewModel = viewModel(), navControlle
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
             Button(
                 onClick = {
                     loginViewModel.login(username, password)
                 },
-
                 enabled = !buttonLoading,
-                modifier = Modifier.padding(top = 16.dp)
             ) {
                 if (loginStatus) {
                     navController.navigate("pages")
@@ -161,9 +158,6 @@ fun LoginScreen(loginViewModel: LoginScreenViewModel = viewModel(), navControlle
                 if (buttonLoading) Text("登录中...")
                 else Text("登录")
             }
-
-//            Text(message)
-
         }
     }
 }

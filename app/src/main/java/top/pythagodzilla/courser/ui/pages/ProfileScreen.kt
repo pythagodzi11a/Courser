@@ -29,8 +29,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -40,8 +40,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -51,7 +49,6 @@ import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Brands
 import compose.icons.fontawesomeicons.brands.Github
 import compose.icons.fontawesomeicons.brands.Qq
-import top.pythagodzilla.courser.R
 import top.pythagodzilla.courser.ui.types.SettingUITypes
 import top.pythagodzilla.courser.ui.viewModels.ProfileScreenViewModel
 
@@ -77,18 +74,18 @@ fun ProfileScreen(
 
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-
-    }
-
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            Text(
-                text = "Courser",
-                style = MaterialTheme.typography.titleLarge,
-                fontSize = 30.sp,
-                modifier = Modifier.padding(16.dp)
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Courser",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontSize = 30.sp,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
             )
 
         }) { paddingValues ->

@@ -1,7 +1,7 @@
 package top.pythagodzilla.courser.data.dataStore
 
-import android.content.Context
+import androidx.datastore.preferences.core.booleanPreferencesKey
 
-class SettingsPreference(private val context: Context) {
-
+class SettingsPreference {
+    val openNotificationKey = booleanPreferencesKey("open_notification")
 }

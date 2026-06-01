@@ -1,7 +1,6 @@
 package top.pythagodzilla.courser.network
 
 import android.util.Log
-import androidx.compose.ui.text.font.Font
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -49,7 +48,7 @@ class LoginModule(
             return Result.failure(StringException("Failed to get session ID: ${getSessionSession.message}"))
         }
 
-        dataStore.saveSessionId(getSessionSession.sessionid)
+        dataStore.set(dataStore.session.sessionKey, getSessionSession.sessionid)
 
         val loginCheckRes = loginCheck(
             appVersion,
@@ -70,10 +69,19 @@ class LoginModule(
                                 "Login successful, session: ${response.sessionid}"
                             )
 
-                            dataStore.saveSessionId(response.sessionid)
-                            dataStore.saveRealName(response.datas.userinfo.user.username)
-                            dataStore.saveLoginTimes(response.datas.userinfo.loginTimes)
-                            dataStore.savePhotoField(response.datas.userinfo.photoFileId)
+                            dataStore.set(dataStore.session.sessionKey, response.sessionid)
+                            dataStore.set(
+                                dataStore.profile.realNameKey,
+                                response.datas.userinfo.user.username
+                            )
+                            dataStore.set(
+                                dataStore.profile.loginTimesKey,
+                                response.datas.userinfo.loginTimes
+                            )
+                            dataStore.set(
+                                dataStore.profile.photoFieldKey,
+                                response.datas.userinfo.photoFileId
+                            )
 
                             return Result.success(response.sessionid)
                         }
@@ -82,7 +90,12 @@ class LoginModule(
 
                     is FailureCheckLoginResponse -> {
                         Log.d("LoginModule", "$response")
-                        return Result.failure(LoginFailureException(response.datas.errorCode, response.datas.errorMessage))
+                        return Result.failure(
+                            LoginFailureException(
+                                response.datas.errorCode,
+                                response.datas.errorMessage
+                            )
+                        )
                     }
                 }
             }
@@ -107,7 +120,7 @@ class LoginModule(
         username: String,
         deviceName: String
     ): GetSessionResponse {
-        val deviceUuid = dataStore.readDeviceUuid() ?: "unknown_device_uuid"
+        val deviceUuid = dataStore.get(dataStore.device.deviceUuidKey) ?: "unknown_device_uuid"
         val body = FormBody.Builder()
             .add("deviceUuid", deviceUuid)
             .add("appVersion", appVersion)
@@ -161,7 +174,7 @@ class LoginModule(
         username: String,
         deviceName: String
     ): Result<BaseCheckResponse> {
-        val deviceUuid = dataStore.readDeviceUuid() ?: "unknown_device_uuid"
+        val deviceUuid = dataStore.get(dataStore.device.deviceUuidKey) ?: "unknown_device_uuid"
 
         val body = FormBody.Builder()
             .add("deviceUuid", deviceUuid)

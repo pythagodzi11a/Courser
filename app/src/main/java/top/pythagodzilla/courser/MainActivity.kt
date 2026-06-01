@@ -51,8 +51,8 @@ import okhttp3.Request
 import org.json.JSONObject
 import top.pythagodzilla.courser.data.dataStore.DataStoreManager
 import top.pythagodzilla.courser.ui.LoginScreen
+import top.pythagodzilla.courser.ui.PageContainer
 import top.pythagodzilla.courser.ui.SplashScreen
-import top.pythagodzilla.courser.ui.pages.PageContainer
 import top.pythagodzilla.courser.ui.theme.CourserTheme
 
 
@@ -94,7 +94,7 @@ fun AppRoot(dataStore: DataStoreManager) {
 
     LaunchedEffect(Unit) {
         isFirstStart = withContext(Dispatchers.IO) {
-            dataStore.readFirstStart()
+            dataStore.device.readFirstStart()
         }
 
         haveLoginInfoStatus = haveLoginInfo(dataStore)
@@ -102,9 +102,9 @@ fun AppRoot(dataStore: DataStoreManager) {
         if (isFirstStart || !haveLoginInfoStatus) {
             // 第一次启动，进入login
             Log.d("AppRoot", "第一次启动，进入login")
-            dataStore.detectAndSaveDeviceUuid()
+            dataStore.device.detectAndSaveDeviceUuid()
 
-            dataStore.setFirstStart()
+            dataStore.device.setFirstStart()
             startDestination = "login"
         } else {
             // 已经登录过，进入home
@@ -166,7 +166,7 @@ fun AppRoot(dataStore: DataStoreManager) {
 
 suspend fun haveLoginInfo(dataStore: DataStoreManager): Boolean {
     return withContext(Dispatchers.IO) {
-        val (username, password) = dataStore.readLoginInfo()
+        val (username, password) = dataStore.session.readLoginInfo()
         !username.isNullOrBlank() && !password.isNullOrBlank()
     }
 }
@@ -198,12 +198,12 @@ suspend fun checkSoftwareUpdate(dataStore: DataStoreManager): UpdateInfo? {
                 val jsonObj = JSONObject(responseBody)
                 val tagName = jsonObj.getString("tag_name")
 
-                val currentVersion = dataStore.readNewestVersion()
+                val currentVersion = dataStore.get(dataStore.update.newestVersionKey)
                 Log.d("UpdateCheck", "Current version: $currentVersion, Latest version: $tagName")
 
                 when (currentVersion) {
                     null -> {
-                        dataStore.saveNewestVersion(tagName)
+                        dataStore.set(dataStore.update.newestVersionKey, tagName)
                     }
 
                     tagName -> {
@@ -212,7 +212,7 @@ suspend fun checkSoftwareUpdate(dataStore: DataStoreManager): UpdateInfo? {
 
                     else -> {
                         Log.d("UpdateCheck", "New version available: $tagName")
-                        dataStore.saveNewestVersion(tagName)
+                        dataStore.set(dataStore.update.newestVersionKey, tagName)
                         result = UpdateInfo(
                             tagName = tagName,
                             downloadUrl = jsonObj.getJSONArray("assets").getJSONObject(0)

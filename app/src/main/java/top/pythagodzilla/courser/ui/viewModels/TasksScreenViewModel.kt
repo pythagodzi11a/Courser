@@ -74,7 +74,7 @@ class TasksScreenViewModel(application: Application) : AndroidViewModel(applicat
                         when (exception) {
                             is SessionExpiredException -> {
                                 withContext(Dispatchers.IO) {
-                                    val (username, password) = dataStore.readLoginInfo()
+                                    val (username, password) = dataStore.session.readLoginInfo()
 
                                     if (!username.isNullOrEmpty() && !password.isNullOrEmpty()) {
                                         val result = client.commonLogin(

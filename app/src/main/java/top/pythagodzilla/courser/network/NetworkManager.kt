@@ -59,7 +59,7 @@ class SessionCookieInterceptor(
         val request = chain.request()
 
         val sessionid = runBlocking {
-            dataStore.readSessionId()
+            dataStore.get(dataStore.session.sessionKey)
         }
 
         Log.d("SessionCookieInterceptor", "Read sessionid from DataStore: $sessionid")

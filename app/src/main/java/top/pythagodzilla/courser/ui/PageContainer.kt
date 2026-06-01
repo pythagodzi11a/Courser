@@ -1,4 +1,4 @@
-package top.pythagodzilla.courser.ui.pages
+package top.pythagodzilla.courser.ui
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.material.icons.Icons
@@ -36,7 +36,7 @@ fun PageContainer(navController: NavController) {
         Crossfade(targetState = currentDestination) { destination ->
             when (destination) {
                 AppDestinations.TASKS -> TasksScreen()
-                AppDestinations.PROFILE -> ProfileScreen(navController = navController)
+                AppDestinations.PROFILE -> ProfileScreen(mainNavController = navController)
             }
         }
     }

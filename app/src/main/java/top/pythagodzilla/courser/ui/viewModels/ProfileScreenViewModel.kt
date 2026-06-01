@@ -23,18 +23,22 @@ class ProfileScreenViewModel(application: Application) :
     private val _realName = MutableStateFlow<String?>(null)
     val realName: StateFlow<String?> = _realName
 
+    private val _openNotification = MutableStateFlow<Boolean?>(null)
+    val openNotification: StateFlow<Boolean?> = _openNotification
+
     init {
         viewModelScope.launch {
-            _avatarUrl.value = dataStore.readPhotoField()
-            _loginTimes.value = dataStore.readLoginTimes()
-            _realName.value = dataStore.readRealName()
+            _avatarUrl.value = dataStore.get(dataStore.profile.photoFieldKey)
+            _loginTimes.value = dataStore.get(dataStore.profile.loginTimesKey)
+            _realName.value = dataStore.get(dataStore.profile.realNameKey)
         }
     }
 
     fun logout(onDone: () -> Unit) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                dataStore.clearLoginInfo()
+                dataStore.session.clearLoginInfo()
+                dataStore.profile.clear()
             }
             onDone()
         }

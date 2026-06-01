@@ -33,7 +33,7 @@ class LoginScreenViewModel(application: Application) : AndroidViewModel(applicat
                 result
                     .onSuccess {
                         loginStatus.value = true
-                        dataStore.addLoginInfo(username, password)
+                        dataStore.session.addLoginInfo(username, password)
                     }
                     .onFailure { exception ->
                         when (exception) {

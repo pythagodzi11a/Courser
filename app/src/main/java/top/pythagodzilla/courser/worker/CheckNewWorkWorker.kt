@@ -90,7 +90,7 @@ class CheckNewWorkWorker(appContext: Context, workerParams: WorkerParameters) :
                     if (retryCount >= 1) return Result.success()
 
                     val (username, password) = withContext(Dispatchers.IO) {
-                        dataStore.readLoginInfo()
+                        dataStore.session.readLoginInfo()
                     }
 
                     if (!username.isNullOrEmpty() && !password.isNullOrEmpty()) {
@@ -135,8 +135,8 @@ class CheckNewWorkWorker(appContext: Context, workerParams: WorkerParameters) :
     }
 
     private suspend fun guard(dataStoreManager: DataStoreManager): Boolean {
-        val firstStart = dataStoreManager.readFirstStart()
-        val (username, password) = dataStoreManager.readLoginInfo()
+        val firstStart = dataStoreManager.device.readFirstStart()
+        val (username, password) = dataStoreManager.session.readLoginInfo()
 
         return (firstStart || username == null || password == null)
     }

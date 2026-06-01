@@ -1,9 +1,11 @@
-package top.pythagodzilla.courser.ui.pages
+package top.pythagodzilla.courser.ui
 
 import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,8 +18,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AcUnit
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,11 +46,13 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Brands
 import compose.icons.fontawesomeicons.brands.Github
 import compose.icons.fontawesomeicons.brands.Qq
+import top.pythagodzilla.courser.ui.types.SettingBlockData
 import top.pythagodzilla.courser.ui.types.SettingUITypes
 import top.pythagodzilla.courser.ui.viewModels.ProfileScreenViewModel
 
@@ -56,23 +60,32 @@ import top.pythagodzilla.courser.ui.viewModels.ProfileScreenViewModel
 @Composable
 fun ProfileScreen(
     profileScreenViewModel: ProfileScreenViewModel = viewModel(),
-    navController: NavController
+    mainNavController: NavController
 ) {
     val photoField by profileScreenViewModel.avatarUrl.collectAsStateWithLifecycle()
     val realName by profileScreenViewModel.realName.collectAsState()
     val loginTimes by profileScreenViewModel.loginTimes.collectAsState()
+    val navController = rememberNavController()
+    val context = LocalContext.current
 
-    val settingsList = listOf(
-        SettingUITypes.Toggle(
-            title = "夜间模式",
-            icon = Icons.Default.AcUnit,
-            contentDescription = "夜间模式",
-            checked = false,
-            onChecked = {}
+    val generateSettings = SettingBlockData(
+        settingTitle = "通用设置",
+        items = listOf(
+            SettingUITypes.Toggle(
+                title = "启用通知",
+                icon = Icons.Default.Notifications,
+                contentDescription = "启用通知",
+                checked = false,
+                onChecked = {}
+            ),
+            SettingUITypes.JumpPage(
+                title = "",
+                icon = Icons.Default.Notifications,
+                contentDescription = "测试页面",
+                onClick = {}
+            )
         )
     )
-
-    val context = LocalContext.current
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -108,7 +121,6 @@ fun ProfileScreen(
                 )
             } else {
                 AsyncImage(
-//                model = "http://course.buct.edu.cn/mobile/common/ckeditor/openminfile.jsp?id=DBDEDEDHDGDACPDHDBDIDEDHDDDDCPDHDBDIDEDHDDDDCOGKHAGH",
                     model = "http://course.buct.edu.cn/mobile/common/ckeditor/openphonefile.jsp?id=$photoField",
                     contentDescription = "Avatar",
                     contentScale = ContentScale.Crop,
@@ -120,6 +132,7 @@ fun ProfileScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -142,50 +155,22 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(8.dp),
-            ) {
-                Column() {
-                    settingsList.forEach { item ->
-                        when (item) {
-                            is SettingUITypes.Toggle -> {
-                                ListItem(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    headlineContent = {
-                                        Text(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            text = item.title,
-                                            style = MaterialTheme.typography.bodyLarge,
-                                        )
-                                    },
-                                    trailingContent = {
-                                        Switch(
-                                            checked = item.checked,
-                                            onCheckedChange = item.onChecked
-                                        )
-                                    }
-                                )
-                            }
-                        }
-                    }
+            SettingBlock(
+                block = generateSettings
+            )
 
-                    ListItem(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        headlineContent = {
-                            Text(
-                                modifier = Modifier.fillMaxWidth(),
-                                text = "参与开发&反馈",
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                        },
-                        trailingContent = { ConnectionRow(context) }
+            ListItem(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                headlineContent = {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "参与开发&反馈",
+                        style = MaterialTheme.typography.bodyLarge,
                     )
-                }
-
-            }
+                },
+                trailingContent = { ConnectionRow(context) }
+            )
 
             Button(
                 modifier = Modifier
@@ -193,7 +178,7 @@ fun ProfileScreen(
                     .padding(horizontal = 8.dp),
                 onClick = {
                     profileScreenViewModel.logout {
-                        navController.navigate("login") {
+                        mainNavController.navigate("login") {
                             popUpTo("pages") { inclusive = true }
                         }
                     }
@@ -206,10 +191,67 @@ fun ProfileScreen(
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
+        }
 
+    }
+
+
+}
+
+@Composable
+private fun SettingBlock(block: SettingBlockData) {
+    Text(
+        text = block.settingTitle,
+        style = MaterialTheme.typography.titleMedium,
+        modifier = Modifier.padding(8.dp)
+    )
+
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Column() {
+            block.items.forEach { settingUITypes ->
+                when (settingUITypes) {
+                    is SettingUITypes.Toggle -> {
+                        ListItem(
+                            headlineContent = { Text(settingUITypes.title) },
+                            supportingContent = { Text(settingUITypes.contentDescription) },
+                            leadingContent = {
+                                Icon(
+                                    imageVector = settingUITypes.icon,
+                                    contentDescription = settingUITypes.contentDescription
+                                )
+                            },
+                            trailingContent = {
+                                Switch(
+                                    checked = settingUITypes.checked,
+                                    onCheckedChange = { settingUITypes.onChecked }
+                                )
+                            }
+                        )
+                    }
+
+                    is SettingUITypes.JumpPage -> {
+                        ListItem(
+                            modifier = Modifier.clickable(onClick = settingUITypes.onClick),
+                            headlineContent = { Text(settingUITypes.title) },
+                            supportingContent = { Text(settingUITypes.contentDescription) },
+                            leadingContent = {
+                                Icon(
+                                    imageVector = settingUITypes.icon,
+                                    contentDescription = settingUITypes.contentDescription
+                                )
+                            }
+                        )
+                    }
+                }
+            }
         }
     }
+
 }
+
 
 @Composable
 private fun ConnectionRow(context: Context) {
@@ -233,7 +275,7 @@ private fun ConnectionRow(context: Context) {
 
         IconButton(onClick = {
             val clipboard =
-                context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             clipboard.setPrimaryClip(ClipData.newPlainText("QQ", "1098721138"))
             Toast.makeText(context, "QQ号已复制到剪贴板", Toast.LENGTH_SHORT).show()
         }) {

@@ -12,7 +12,6 @@ import okhttp3.OkHttpClient
 import top.pythagodzilla.courser.data.dataBase.TaskDataBase
 import top.pythagodzilla.courser.data.dataStore.DataStoreManager
 import top.pythagodzilla.courser.network.NetworkManager
-import top.pythagodzilla.courser.network.OkHttpManager
 import top.pythagodzilla.courser.network.SessionCookieInterceptor
 import top.pythagodzilla.courser.worker.CheckNewWorkWorker
 import java.util.concurrent.TimeUnit
@@ -26,7 +25,7 @@ class CourserApplication : Application() {
             .build()
     }
     val client: NetworkManager by lazy {
-        OkHttpManager(
+        NetworkManager(
             client = okHttpClient,
             dataStore = dataStore
         )

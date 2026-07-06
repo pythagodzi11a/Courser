@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -111,14 +112,6 @@ fun AppRoot(dataStore: DataStoreManager) {
             Log.d("AppRoot", "查询到用户信息，进入home")
             startDestination = "pages"
         }
-
-        if (ContextCompat.checkSelfPermission(
-                context,
-                android.Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-        }
     }
 
     LaunchedEffect(Unit) {
@@ -127,6 +120,16 @@ fun AppRoot(dataStore: DataStoreManager) {
             Log.d("AppRoot", "发现新版本: ${updateInfoFetch.tagName}")
             updateInfo.value = updateInfoFetch
             showUpdateDialog.value = true
+        }
+    }
+
+    SideEffect {
+        if (ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 

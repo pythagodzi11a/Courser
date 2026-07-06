@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Password
@@ -130,8 +131,7 @@ fun LoginScreen(loginViewModel: LoginScreenViewModel = viewModel(), navControlle
             )
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
                 TextButton(onClick = {
@@ -145,11 +145,15 @@ fun LoginScreen(loginViewModel: LoginScreenViewModel = viewModel(), navControlle
                 }
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
+
             Button(
                 onClick = {
                     loginViewModel.login(username, password)
                 },
+
                 enabled = !buttonLoading,
+                modifier = Modifier.widthIn(min = 100.dp)
             ) {
                 if (loginStatus) {
                     navController.navigate("pages")

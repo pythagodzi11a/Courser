@@ -1,5 +1,6 @@
 package top.pythagodzilla.courser.network
 
+import android.os.Build
 import android.util.Log
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
@@ -25,7 +26,7 @@ class NetworkManager(
         appVersion: String = "8.7.1",
         password: String,
         devicePlatform: String = "android",
-        deviceVersion: String = "16",
+        deviceVersion: String = Build.VERSION.RELEASE,
         username: String,
         deviceName: String = "GUGUGAGA"
     ) = loginModule.commonLogin(

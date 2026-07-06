@@ -132,7 +132,7 @@ class LoginModule(
             .build()
 
         Log.d(
-            "OkHttpManager",
+            "NetworkManager",
             "Request Body: deviceUuid=$deviceUuid, appVersion=$appVersion, j_password=xxxx, devicePlatform=$devicePlatform, deviceVersion=$deviceVersion, j_username=$username, deviceName=$deviceName"
         )
 
@@ -150,7 +150,7 @@ class LoginModule(
             }
         } catch (e: Exception) {
             Log.e(
-                "OkHttpManager",
+                "NetworkManager",
                 "Error occurred during getSessionId request: ${e::class.java.name}: ${e.message}"
             )
 
@@ -210,7 +210,7 @@ class LoginModule(
             }
         } catch (e: Exception) {
             Log.e(
-                "OkHttpManager",
+                "NetworkManager",
                 "Error occurred during session check request: ${e::class.java.name}: ${e.message}",
                 e
             )
@@ -233,7 +233,7 @@ class LoginModule(
                 val result = checkResponseNotLogin(content)
                 result
                     .onSuccess {
-                        Log.d("OkHttpManager", "Session is valid.")
+                        Log.d("NetworkManager", "Session is valid.")
                         return true
                     }
                     // 先做成功的吧，去他妈的鲁棒性
@@ -247,7 +247,7 @@ class LoginModule(
             }
         } catch (e: Exception) {
             Log.e(
-                "OkHttpManager",
+                "NetworkManager",
                 "Error occurred during session valid check request: ${e::class.java.name}: ${e.message}",
                 e
             )

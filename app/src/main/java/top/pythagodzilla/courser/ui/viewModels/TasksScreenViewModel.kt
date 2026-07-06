@@ -89,7 +89,7 @@ class TasksScreenViewModel(application: Application) : AndroidViewModel(applicat
                         }
                     }
             } catch (e: Exception) {
-                Log.e("OkHttpManager", e.toString())
+                Log.e("NetworkManager", e.toString())
             }
         }
     }

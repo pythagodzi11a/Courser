@@ -28,7 +28,7 @@ class NetworkManager(
         devicePlatform: String = "android",
         deviceVersion: String = Build.VERSION.RELEASE,
         username: String,
-        deviceName: String = "GUGUGAGA"
+        deviceName: String = Build.MODEL,
     ) = loginModule.commonLogin(
         appVersion,
         password,
@@ -38,35 +38,36 @@ class NetworkManager(
         deviceName
     )
 
-    private suspend fun getSessionId(
-        appVersion: String,
-        password: String,
-        devicePlatform: String,
-        deviceVersion: String,
-        username: String,
-        deviceName: String
-    ) = loginModule.getSessionId(
-        appVersion, password, devicePlatform, deviceVersion, username, deviceName
-    )
 
-    private suspend fun loginCheck(
-        deviceUuid: String,
-        appVersion: String,
-        password: String,
-        devicePlatform: String,
-        deviceVersion: String,
-        username: String,
-        deviceName: String
-    ) = loginModule.loginCheck(
-        appVersion, password, devicePlatform, deviceVersion, username, deviceName
-    )
+//    private suspend fun getSessionId(
+//        appVersion: String,
+//        password: String,
+//        devicePlatform: String,
+//        deviceVersion: String,
+//        username: String,
+//        deviceName: String
+//    ) = loginModule.getSessionId(
+//        appVersion, password, devicePlatform, deviceVersion, username, deviceName
+//    )
+
+//    private suspend fun loginCheck(
+//        deviceUuid: String,
+//        appVersion: String,
+//        password: String,
+//        devicePlatform: String,
+//        deviceVersion: String,
+//        username: String,
+//        deviceName: String
+//    ) = loginModule.loginCheck(
+//        appVersion, password, devicePlatform, deviceVersion, username, deviceName
+//    )
 
     // 获取信息接口的实现，封装到GetInfoModule
     private suspend fun getUndoTasks(): Result<TasksApiResponseClass> = getInfoModule.getUndoTasks()
 
     suspend fun getUndoTasksString(): Result<String> = getInfoModule.getUndoTasksString()
 
-    private suspend fun isSessionValid(sessionId: String): Boolean = loginModule.isSessionValid()
+//    private suspend fun isSessionValid(sessionId: String): Boolean = loginModule.isSessionValid()
 
     suspend fun enterCourse(courseId: String): Result<String> = getInfoModule.enterCourse(courseId)
 

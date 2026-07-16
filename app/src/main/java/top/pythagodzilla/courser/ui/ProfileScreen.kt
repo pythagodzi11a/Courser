@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,7 +28,6 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -46,14 +44,13 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHost
 import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
 import compose.icons.FontAwesomeIcons
 import compose.icons.fontawesomeicons.Brands
 import compose.icons.fontawesomeicons.brands.Github
 import compose.icons.fontawesomeicons.brands.Qq
-import top.pythagodzilla.courser.ui.types.SettingBlockData
-import top.pythagodzilla.courser.ui.types.SettingUITypes
 import top.pythagodzilla.courser.ui.viewModels.ProfileScreenViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,24 +65,6 @@ fun ProfileScreen(
     val navController = rememberNavController()
     val context = LocalContext.current
 
-    val generateSettings = SettingBlockData(
-        settingTitle = "通用设置",
-        items = listOf(
-            SettingUITypes.Toggle(
-                title = "启用通知",
-                icon = Icons.Default.Notifications,
-                contentDescription = "启用通知",
-                checked = false,
-                onChecked = {}
-            ),
-            SettingUITypes.JumpPage(
-                title = "",
-                icon = Icons.Default.Notifications,
-                contentDescription = "测试页面",
-                onClick = {}
-            )
-        )
-    )
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -155,9 +134,19 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            SettingBlock(
-                block = generateSettings
-            )
+            SettingBlock("设置") {
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    ListItem(
+                        modifier = Modifier.clickable(onClick = {
+                            navController.navigate("setting")
+                        }),
+                        headlineContent = { Text("通用设置") }
+                    )
+                }
+            }
 
             ListItem(
                 modifier = Modifier
@@ -195,62 +184,79 @@ fun ProfileScreen(
 
     }
 
-
 }
 
+
 @Composable
-private fun SettingBlock(block: SettingBlockData) {
-    Text(
-        text = block.settingTitle,
-        style = MaterialTheme.typography.titleMedium,
+private fun SettingBlock(settingName: String, content: @Composable () -> Unit) {
+    Column(
         modifier = Modifier.padding(8.dp)
-    )
-
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(8.dp)
     ) {
-        Column() {
-            block.items.forEach { settingUITypes ->
-                when (settingUITypes) {
-                    is SettingUITypes.Toggle -> {
-                        ListItem(
-                            headlineContent = { Text(settingUITypes.title) },
-                            supportingContent = { Text(settingUITypes.contentDescription) },
-                            leadingContent = {
-                                Icon(
-                                    imageVector = settingUITypes.icon,
-                                    contentDescription = settingUITypes.contentDescription
-                                )
-                            },
-                            trailingContent = {
-                                Switch(
-                                    checked = settingUITypes.checked,
-                                    onCheckedChange = { settingUITypes.onChecked }
-                                )
-                            }
-                        )
-                    }
+        // Title
+        Text(
+            text = settingName,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
 
-                    is SettingUITypes.JumpPage -> {
-                        ListItem(
-                            modifier = Modifier.clickable(onClick = settingUITypes.onClick),
-                            headlineContent = { Text(settingUITypes.title) },
-                            supportingContent = { Text(settingUITypes.contentDescription) },
-                            leadingContent = {
-                                Icon(
-                                    imageVector = settingUITypes.icon,
-                                    contentDescription = settingUITypes.contentDescription
-                                )
-                            }
-                        )
-                    }
-                }
-            }
-        }
+        content()
     }
 
 }
+
+//@Composable
+//private fun SettingBlock(block: SettingBlockData) {
+//    Text(
+//        text = block.settingTitle,
+//        style = MaterialTheme.typography.titleMedium,
+//        modifier = Modifier.padding(8.dp)
+//    )
+//
+//    Surface(
+//        modifier = Modifier.fillMaxWidth(),
+//        shape = RoundedCornerShape(8.dp)
+//    ) {
+//        Column() {
+//            block.items.forEach { settingUITypes ->
+//                when (settingUITypes) {
+//                    is SettingUITypes.Toggle -> {
+//                        ListItem(
+//                            headlineContent = { Text(settingUITypes.title) },
+//                            supportingContent = { Text(settingUITypes.contentDescription) },
+//                            leadingContent = {
+//                                Icon(
+//                                    imageVector = settingUITypes.icon,
+//                                    contentDescription = settingUITypes.contentDescription
+//                                )
+//                            },
+//                            trailingContent = {
+//                                Switch(
+//                                    checked = settingUITypes.checked,
+//                                    onCheckedChange = { settingUITypes.onChecked }
+//                                )
+//                            }
+//                        )
+//                    }
+//
+//                    is SettingUITypes.JumpPage -> {
+//                        ListItem(
+//                            modifier = Modifier.clickable(onClick = settingUITypes.onClick),
+//                            headlineContent = { Text(settingUITypes.title) },
+//                            supportingContent = { Text(settingUITypes.contentDescription) },
+//                            leadingContent = {
+//                                Icon(
+//                                    imageVector = settingUITypes.icon,
+//                                    contentDescription = settingUITypes.contentDescription
+//                                )
+//                            }
+//                        )
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//}
 
 
 @Composable

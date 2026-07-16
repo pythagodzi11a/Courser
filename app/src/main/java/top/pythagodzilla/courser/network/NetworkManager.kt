@@ -38,7 +38,7 @@ class NetworkManager(
         deviceName
     )
 
-    suspend fun getSessionId(
+    private suspend fun getSessionId(
         appVersion: String,
         password: String,
         devicePlatform: String,
@@ -49,7 +49,7 @@ class NetworkManager(
         appVersion, password, devicePlatform, deviceVersion, username, deviceName
     )
 
-    suspend fun loginCheck(
+    private suspend fun loginCheck(
         deviceUuid: String,
         appVersion: String,
         password: String,
@@ -62,11 +62,11 @@ class NetworkManager(
     )
 
     // 获取信息接口的实现，封装到GetInfoModule
-    suspend fun getUndoTasks(): Result<TasksApiResponseClass> = getInfoModule.getUndoTasks()
+    private suspend fun getUndoTasks(): Result<TasksApiResponseClass> = getInfoModule.getUndoTasks()
 
     suspend fun getUndoTasksString(): Result<String> = getInfoModule.getUndoTasksString()
 
-    suspend fun isSessionValid(sessionId: String): Boolean = loginModule.isSessionValid()
+    private suspend fun isSessionValid(sessionId: String): Boolean = loginModule.isSessionValid()
 
     suspend fun enterCourse(courseId: String): Result<String> = getInfoModule.enterCourse(courseId)
 

@@ -1,4 +1,4 @@
-package top.pythagodzilla.courser.ui
+package top.pythagodzilla.courser.ui.pages
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -44,7 +44,6 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavHost
 import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
 import compose.icons.FontAwesomeIcons
@@ -183,7 +182,6 @@ fun ProfileScreen(
         }
 
     }
-
 }
 
 

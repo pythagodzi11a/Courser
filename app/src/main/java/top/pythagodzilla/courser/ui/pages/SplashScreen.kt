@@ -1,4 +1,4 @@
-package top.pythagodzilla.courser.ui
+package top.pythagodzilla.courser.ui.pages
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding

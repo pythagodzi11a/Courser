@@ -1,4 +1,4 @@
-package top.pythagodzilla.courser.ui
+package top.pythagodzilla.courser.ui.pages
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.material.icons.Icons

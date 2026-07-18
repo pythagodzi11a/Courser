@@ -1,4 +1,4 @@
-package top.pythagodzilla.courser.ui
+package top.pythagodzilla.courser.ui.pages
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement

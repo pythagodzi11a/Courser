@@ -51,9 +51,9 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
 import top.pythagodzilla.courser.data.dataStore.DataStoreManager
-import top.pythagodzilla.courser.ui.LoginScreen
-import top.pythagodzilla.courser.ui.PageContainer
-import top.pythagodzilla.courser.ui.SplashScreen
+import top.pythagodzilla.courser.ui.pages.LoginScreen
+import top.pythagodzilla.courser.ui.pages.PageContainer
+import top.pythagodzilla.courser.ui.pages.SplashScreen
 import top.pythagodzilla.courser.ui.theme.CourserTheme
 
 
